@@ -1,2 +1,2 @@
-# RoBin-Creating-topographic-map
-Using ground based robot "RoBin" with sensors on board to create a topographic map of are traversed by the robot
+# Topographic Map creation optimization algorithm
+Using sampled GPS data I'll create a topographic map and then optimize it to include less data points
