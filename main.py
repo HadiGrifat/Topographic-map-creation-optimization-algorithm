@@ -6,9 +6,11 @@ from modules.interpolation import create_grid, interpolate_elevation
 def main():
 # Step 1: Load data
     lats, lons, alts = load_gpx_data('Data/Track2_24_4_2025.gpx')
+    print(f"Number of GPS points: {len(lats)}")
 
     # Step 2: Normalize elevation
     alts = normalize_elevation(alts)
+    print(f"Elevation range: {np.min(alts):.1f} to {np.max(alts):.1f} meters")
 
     # Step 3: Create 3D plot
     plot_3D(lats, lons, alts)
@@ -18,10 +20,13 @@ def main():
     z = np.array(alts)
 
     # Step 5: Create interpolation grid
-    xi, yi = create_grid(x, y, 200)
+    grid_size = 200
+    xi, yi = create_grid(x, y, grid_size)
+    print(f"Grid size: {grid_size}x{grid_size} = {grid_size**2} interpolated points")
 
     # Step 6: Interpolate elevation
     zi = interpolate_elevation(x, y, z, xi, yi)
+    print(f"Interpolated elevation range: {np.nanmin(zi):.1f} to {np.nanmax(zi):.1f} meters")
 
     # Step 7: Create contour plot
     create_contour_plot(xi, yi, zi)
