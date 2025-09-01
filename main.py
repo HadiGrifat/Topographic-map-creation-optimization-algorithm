@@ -1,7 +1,7 @@
 import numpy as np
-from data_proccessing import load_gpx_data, normalize_elevation, coord_transform
-from visualization import plot_3D, create_contour_plot
-from interpolation import create_grid, interpolate_elevation
+from modules.data_processing import load_gpx_data, normalize_elevation, coord_transform
+from modules.visualization import plot_3D, create_contour_plot
+from modules.interpolation import create_grid, interpolate_elevation
 
 def main():
 # Step 1: Load data
