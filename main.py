@@ -1,6 +1,6 @@
 import numpy as np
 from modules.data_processing import load_gpx_data, normalize_elevation, coord_transform
-from modules.visualization import plot_3D, create_contour_plot
+from modules.visualization import plot_3D, create_contour_plot, create_3d_contour
 from modules.interpolation import create_grid, interpolate_elevation
 
 def main():
@@ -30,6 +30,7 @@ def main():
 
     # Step 7: Create contour plot
     create_contour_plot(xi, yi, zi)
+    create_3d_contour(xi, yi, zi)
 
 if __name__=="__main__":
     main()
