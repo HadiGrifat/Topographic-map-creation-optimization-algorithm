@@ -37,7 +37,20 @@ def create_3d_contour(xi, yi, zi, x_gps=None, y_gps=None, z_gps=None):
         scene = dict(
             xaxis_title = 'X (m)',
             yaxis_title = 'Y (m)',
-            zaxis_title = 'Elevation (m)'
-        )
+            zaxis_title = 'Elevation (m)',
+            camera = dict(
+                eye = dict(x=0, y=-1.5, z=0.5), # starting orientation looking north (negative y)
+                # alternatives: x=1, y=1, z=0.8 isometric view
+                # x=0, y=0, z=2 top down view
+                up = dict(x=0, y=0, z=1) # z axis looking up
+            )),
+            # adding a rest button for orientation
+        updatemenus = [dict( # create interactive UI element
+            type = "buttons", # type of UI element wanted
+            buttons = [dict(label="Reset View", #label: text that appear on button
+                            method="relayout", # what action is done when button is pressed, relayout changes plot layout/styling
+                            args=["scene.camera", # what specificaly to change
+                                    dict(eye=dict(x=0, y=-1.5, z=0.5))])]
+        )]
     )
     fig.show()
