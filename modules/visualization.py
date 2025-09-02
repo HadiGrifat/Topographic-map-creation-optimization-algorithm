@@ -29,7 +29,19 @@ def create_3d_contour(xi, yi, zi, x_gps=None, y_gps=None, z_gps=None):
         y = yi,
         z= zi,
         colorscale='earth',
-        showscale=True
+        showscale=True,
+        contours=dict( # make contour lines show up on mesh
+            z=dict(
+                show=True,
+                usecolormap=False,
+                highlightcolor="red", # highlight color
+                project_z=False, # project on xy plane
+                width=3, # width if lines
+                size=2, # spacing, every x meters
+                start=0, # start lines at elevation x
+                end=35 # end lines at elevation x
+            )
+        )
     )
     fig = go.Figure(data=[surface]) # create gifure
     fig.update_layout(  # set up the scene for the figure create a line above, layout settings
