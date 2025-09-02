@@ -12,11 +12,22 @@ def plot_3D(lats, lons, alts):
     plt.title('Topographic Map from GPX')
     plt.show()
 
-def create_contour_plot(xi, yi, zi):
+def create_contour_plot(xi, yi, zi, x_gps=None, y_gps=None, z_gps=None):
     # Plot contours                       
     plt.contourf(xi, yi, zi, cmap='terrain')
     #plt.contour(xi, yi, zi, cmap='terrain')
     plt.colorbar(label="Elevation (m)")
+    if z_gps==None:
+        z="red"
+    else:
+        z = z_gps
+    if x_gps is not None and y_gps is not None:
+        scatter = plt.scatter(x_gps, y_gps,
+                              #c= "red",
+                              c=z,
+                              s=5,
+                              alpha=0.8
+                              )
     plt.title("Topographic Contour Map")
     plt.xlabel("X (m)")
     plt.ylabel("Y (m)")
