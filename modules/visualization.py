@@ -15,13 +15,16 @@ def plot_3D(lats, lons, alts):
 def create_contour_plot(xi, yi, zi, x_gps=None, y_gps=None, z_gps=None):
     # Plot contours                       
     plt.contourf(xi, yi, zi, cmap='terrain')
-    #plt.contour(xi, yi, zi, cmap='terrain')
     plt.colorbar(label="Elevation (m)")
+    # addong elevation labels to contour lines
+    contour_lines = plt.contour(xi, yi, zi, colors='black', linewidths=0.5)
+    plt.clabel(contour_lines, inline=True, fontsize=4, fmt='%0.0f m')
+    # if z_gps is given, plot map with points colored by elevation, if not by color red
     if z_gps==None:
         z="red"
     else:
         z = z_gps
-    if x_gps is not None and y_gps is not None:
+    if x_gps is not None and y_gps is not None: # scattering the gps data points
         scatter = plt.scatter(x_gps, y_gps,
                               #c= "red",
                               c=z,
