@@ -34,6 +34,7 @@ def create_3d_contour(xi, yi, zi, x_gps=None, y_gps=None, z_gps=None):
             z=dict(
                 show=True,
                 usecolormap=False,
+                #color="red", # contour lines color, default = black
                 highlightcolor="red", # highlight color
                 project_z=False, # project on xy plane
                 width=3, # width if lines
@@ -43,7 +44,24 @@ def create_3d_contour(xi, yi, zi, x_gps=None, y_gps=None, z_gps=None):
             )
         )
     )
-    fig = go.Figure(data=[surface]) # create gifure
+    # adding gps data to the 3d mesh
+    if x_gps is not None and y_gps is not None and z_gps is not None:
+        gps_points = go.Scatter3d(
+            x = x_gps,
+            y = y_gps,
+            z = z_gps,
+            mode = "markers",
+            marker=dict(
+                size=3,
+                color="red",
+                symbol="circle"
+            ),
+            name='GPS Sample Points'
+        )
+        fig = go.Figure(data=[surface, gps_points])
+    else:
+        fig = go.Figure(data=[surface]) # create figure
+        
     fig.update_layout(  # set up the scene for the figure create a line above, layout settings
         title = '3D Topographic Contour Map',
         scene = dict(

@@ -30,7 +30,9 @@ def main():
 
     # Step 7: Create contour plot
     create_contour_plot(xi, yi, zi)
-    create_3d_contour(xi, yi, zi)
+    # create_3d_contour take optional params of the orignal gps coord, x,y,z
+    # in order to plot them on the mesh
+    create_3d_contour(xi, yi, zi, x, y, z)
 
 if __name__=="__main__":
     main()
