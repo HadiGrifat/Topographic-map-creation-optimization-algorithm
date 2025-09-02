@@ -1,11 +1,17 @@
 import numpy as np
-from modules.data_processing import load_gpx_data, normalize_elevation, coord_transform
+from modules.data_processing import load_gpx_data, load_multiple_gpx, normalize_elevation, coord_transform
 from modules.visualization import plot_3D, create_contour_plot, create_3d_contour
 from modules.interpolation import create_grid, interpolate_elevation
 
 def main():
-# Step 1: Load data
+    # Step 1: Load data
     lats, lons, alts = load_gpx_data('Data/Track2_24_4_2025.gpx')
+    # combined data pipeline
+    gpx_files = [
+        '',
+        ''
+    ]
+    lats, lons, alts = load_multiple_gpx(gpx_files)
     print(f"Number of GPS points: {len(lats)}") # print number of gps samples
 
     # Step 2: Normalize elevation

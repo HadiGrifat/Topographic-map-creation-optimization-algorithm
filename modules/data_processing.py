@@ -15,6 +15,21 @@ def load_gpx_data(filename):
                 alts.append(point.elevation)
     return lats, lons, alts
 
+def load_multiple_gpx(gpx_files):
+    '''
+    load and combine data from multiple gpx files
+    arguments: list of gpx file paths
+    return: combined lats, lons, alts lists
+    '''
+    all_lats, all_lons, all_alts = [], [], []
+    for filename in gpx_files:
+        print(f"loading {filename}...")
+        lats, lons, alts = load_gpx_data(filename)
+        all_lats.extend(lats)
+        all_lons.extend(lons)
+        all_alts.extend(alts)
+    return all_lats, all_lons, all_alts
+
 def normalize_elevation(alts):
     alts = np.array(alts) # convert to numpy array
     alts -= np.min(alts) # normalizing elevation so min(alts) = 0
