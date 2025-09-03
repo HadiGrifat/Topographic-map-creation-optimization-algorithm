@@ -5,7 +5,7 @@ from modules.interpolation import create_grid, interpolate_elevation
 
 def main():
     # Step 1: Load data
-    lats, lons, alts = load_gpx_data('Data/7_4_Tech_Park.gpx')
+    lats, lons, alts = load_gpx_data('Data/Track2_24_4_2025.gpx')
     # combined data pipeline
     #gpx_files = [
     #    'Data/Track2_24_4_2025.gpx',
