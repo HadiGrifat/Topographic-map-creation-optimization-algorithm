@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Main entry point for the mapping project
 Coordinates between UI (menu_system) and mapping logic (pipeline_controller)
