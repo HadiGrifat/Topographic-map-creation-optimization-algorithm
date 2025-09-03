@@ -38,4 +38,7 @@ def normalize_elevation(alts):
 def coord_transform(lats, lons):
     transformer = Transformer.from_crs("epsg:4326", "epsg:32636", always_xy=True) # tranforming latitude and longitude from degree into meters for projection
     x, y = transformer.transform(lons, lats)
+    # normalize coordinates so min(x) = 0 and min(y) = 0, similar to elevation normalization
+    x = np.array(x) - np.min(x)
+    y = np.array(y) - np.min(y)
     return x, y

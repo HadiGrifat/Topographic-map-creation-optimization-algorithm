@@ -5,13 +5,13 @@ from modules.interpolation import create_grid, interpolate_elevation
 
 def main():
     # Step 1: Load data
-    lats, lons, alts = load_gpx_data('Data/Track2_24_4_2025.gpx')
+    lats, lons, alts = load_gpx_data('Data/7_4_Tech_Park.gpx')
     # combined data pipeline
-    gpx_files = [
-        '',
-        ''
-    ]
-    lats, lons, alts = load_multiple_gpx(gpx_files)
+    #gpx_files = [
+    #    'Data/Track2_24_4_2025.gpx',
+    #    'Data/Track1_24_4_2025.gpx'
+    #]
+    #lats, lons, alts = load_multiple_gpx(gpx_files)
     print(f"Number of GPS points: {len(lats)}") # print number of gps samples
 
     # Step 2: Normalize elevation
@@ -23,7 +23,8 @@ def main():
 
     # Step 4: Transform coordinates
     x, y = coord_transform(lats, lons)
-    z = np.array(alts)
+    z = np.array(alts) # alts is already a np array so we could just say z=alts but i am choosing to
+    # keep it like this for ease of understanding, since alts is turned into a np array in a function
 
     # Step 5: Create interpolation grid
     grid_size = 20
