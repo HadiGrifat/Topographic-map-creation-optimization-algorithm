@@ -2,7 +2,7 @@
 Menu system for mapping project - handles ONLY user interface logic
 """
 import os
-from .pipeline_controller import get_available_methods
+from .pipeline_controller import get_available_methods, get_available_interpolations
 
 def get_available_gpx_files():
     """Scan Data folder for all .gpx files"""
@@ -99,6 +99,25 @@ def choose_data_source():
         else:
             print("Invalid choice. Please enter 1 or 2.")
 
+def choose_interpolation_method():
+    """Let user choose specific interpolation method"""
+    methods = get_available_interpolations()
+    
+    print("\nInterpolation Methods:")
+    print("=" * 30)
+    for i, (method_key, method_name) in enumerate(methods, 1):
+        print(f"{i}. {method_name}")
+    
+    while True:
+        try:
+            choice = int(input(f"\nSelect interpolation method (1-{len(methods)}): "))
+            if 1 <= choice <= len(methods):
+                return methods[choice - 1][0]  # Return method key ('linear', 'cubic', 'nearest')
+            else:
+                print(f"Please enter a number between 1 and {len(methods)}")
+        except ValueError:
+            print("Please enter a valid number")
+
 def choose_method():
     """Let user choose interpolation method"""
     methods = get_available_methods()
@@ -113,7 +132,14 @@ def choose_method():
         try:
             choice = int(input(f"\nSelect option (1-{len(methods) + 1}): "))
             if 1 <= choice <= len(methods):
-                return methods[choice - 1][0]  # Return just the method key
+                method_key = methods[choice - 1][0]  # Get the category key
+                
+                if method_key == 'interpolation':
+                    # Show interpolation submenu
+                    return choose_interpolation_method()
+                elif method_key == 'delaunay':
+                    return 'delaunay'
+                    
             elif choice == len(methods) + 1:
                 return None  # Exit
             else:

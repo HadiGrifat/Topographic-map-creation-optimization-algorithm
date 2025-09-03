@@ -30,16 +30,24 @@ def run_pipeline(method, data_source, is_multiple):
         
     except NotImplementedError as e:
         print(f"\nError: {method} method not implemented yet!")
-        print("Available methods: linear")
+        print("Available methods: standard interpolation")
         return False
     except Exception as e:
         print(f"\nError running pipeline: {e}")
         return False
 
 def get_available_methods():
+    """Return list of available mapping methods"""
+    return [
+        ('interpolation', 'Interpolation'),
+        ('delaunay', 'Delaunay Triangulation (experimental)')
+    ]
+
+def get_available_interpolations():
     """Return list of available interpolation methods"""
     return [
         ('linear', 'Linear Interpolation'),
-        ('delaunay', 'Delaunay Triangulation (experimental)')
+        ('cubic', 'Cubic Interpolation'),
+        ('nearest', 'Nearest Value Interpolation')
     ]
 
