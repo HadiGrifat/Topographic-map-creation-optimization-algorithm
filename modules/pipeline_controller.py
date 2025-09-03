@@ -43,32 +43,3 @@ def get_available_methods():
         ('delaunay', 'Delaunay Triangulation (experimental)')
     ]
 
-def run_method_comparison(data_source, is_multiple, methods=None):
-    """Run multiple methods on the same data for comparison"""
-    if methods is None:
-        methods = ['linear']  # Default to working methods only
-    
-    if data_source is None:
-        print("No data source selected.")
-        return False
-    
-    print(f"\nRunning method comparison with {len(methods)} methods...")
-    print("=" * 60)
-    
-    results = {}
-    for method in methods:
-        print(f"\n--- Running {method} method ---")
-        success = run_pipeline(method, data_source, is_multiple)
-        results[method] = success
-        
-        if not success:
-            print(f"Skipping {method} due to error.")
-            continue
-    
-    # Summary
-    print(f"\n--- Comparison Results ---")
-    for method, success in results.items():
-        status = "✓ Success" if success else "✗ Failed"
-        print(f"{method}: {status}")
-    
-    return results

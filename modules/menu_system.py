@@ -107,53 +107,19 @@ def choose_method():
     print("=" * 30)
     for i, (method_key, method_name) in enumerate(methods, 1):
         print(f"{i}. {method_name}")
-    print(f"{len(methods) + 1}. Method Comparison")
-    print(f"{len(methods) + 2}. Exit")
+    print(f"{len(methods) + 1}. Exit")
     
     while True:
         try:
-            choice = int(input(f"\nSelect option (1-{len(methods) + 2}): "))
+            choice = int(input(f"\nSelect option (1-{len(methods) + 1}): "))
             if 1 <= choice <= len(methods):
-                return methods[choice - 1][0], 'single'  # Return method key and type
+                return methods[choice - 1][0]  # Return just the method key
             elif choice == len(methods) + 1:
-                return None, 'comparison'  # Special case for comparison
-            elif choice == len(methods) + 2:
-                return None, 'exit'
+                return None  # Exit
             else:
-                print(f"Please enter a number between 1 and {len(methods) + 2}")
+                print(f"Please enter a number between 1 and {len(methods) + 1}")
         except ValueError:
             print("Please enter a valid number")
-
-def choose_comparison_methods():
-    """Let user choose which methods to compare"""
-    methods = get_available_methods()
-    
-    print("\nSelect methods to compare:")
-    for i, (method_key, method_name) in enumerate(methods, 1):
-        print(f"{i}. {method_name}")
-    print(f"{len(methods) + 1}. All available methods")
-    
-    while True:
-        choice_input = input(f"Enter method numbers separated by commas (e.g., 1,2) or {len(methods) + 1} for all: ").strip()
-        
-        if choice_input == str(len(methods) + 1):
-            return [method_key for method_key, _ in methods]
-            
-        try:
-            choices = [int(x.strip()) for x in choice_input.split(',')]
-            selected_methods = []
-            
-            for choice in choices:
-                if 1 <= choice <= len(methods):
-                    selected_methods.append(methods[choice - 1][0])
-                else:
-                    print(f"Invalid choice: {choice}")
-                    break
-            else:  # This runs if the loop completed without break
-                return selected_methods
-                
-        except ValueError:
-            print("Please enter valid numbers separated by commas")
 
 def get_user_choices():
     """Get all user choices and return them"""
@@ -161,17 +127,12 @@ def get_user_choices():
     print("=" * 45)
     
     # Get method choice
-    method, run_type = choose_method()
+    method = choose_method()
     
-    if run_type == 'exit':
-        return None, None, None, 'exit'
+    if method is None:
+        return None, None, None
     
     # Get data source
     data_source, is_multiple = choose_data_source()
     
-    if run_type == 'comparison':
-        # For comparison, let user choose which methods to compare
-        methods_to_compare = choose_comparison_methods()
-        return methods_to_compare, data_source, is_multiple, 'comparison'
-    
-    return method, data_source, is_multiple, 'single'
+    return method, data_source, is_multiple
