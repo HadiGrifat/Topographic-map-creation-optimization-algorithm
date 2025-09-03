@@ -1,4 +1,4 @@
-from mapping_pipeline import MappingPipeline
+from modules.mapping_pipeline import MappingPipeline
 
 print("Testing MappingPipeline class...")
 print("=" * 40)

@@ -1,7 +1,7 @@
 import numpy as np
-from modules.data_processing import load_gpx_data, load_multiple_gpx, normalize_elevation, coord_transform
-from modules.visualization import plot_3D, create_contour_plot, create_3d_contour
-from modules.interpolation import create_grid, interpolate_elevation
+from .data_processing import load_gpx_data, load_multiple_gpx, normalize_elevation, coord_transform
+from .visualization import plot_3D, create_contour_plot, create_3d_contour
+from .interpolation import create_grid, interpolate_elevation
 
 class MappingPipeline:
     def __init__(self):

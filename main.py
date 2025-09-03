@@ -1,86 +1,38 @@
 #!/usr/bin/env python3
 """
-Main script for running different mapping methods
+Main entry point for the mapping project
+Coordinates between UI (menu_system) and business logic (pipeline_controller)
 """
-from mapping_pipeline import MappingPipeline
-
-def run_linear_interpolation():
-    """Run your current working method - linear interpolation"""
-    print("Running Linear Interpolation Method")
-    print("=" * 50)
-    
-    pipeline = MappingPipeline()
-    pipeline.load_data('Data/Track2_24_4_2025.gpx')
-    pipeline.preprocess_data()
-    pipeline.visualize_3d_original()
-    pipeline.create_interpolation_grid(grid_size=20)
-    pipeline.interpolate_data(method='linear')
-    pipeline.visualize_contour_2d()
-    pipeline.visualize_contour_3d()
-
-def run_delaunay_triangulation():
-    """Placeholder for Delaunay method - you'll implement this later"""
-    print("Running Delaunay Triangulation Method")
-    print("=" * 50)
-    
-    pipeline = MappingPipeline()
-    pipeline.load_data('Data/Track2_24_4_2025.gpx')
-    pipeline.preprocess_data()
-    pipeline.visualize_3d_original()
-    pipeline.create_interpolation_grid(grid_size=20)
-    
-    try:
-        pipeline.interpolate_data(method='delaunay')
-        pipeline.visualize_contour_2d()
-        pipeline.visualize_contour_3d()
-    except NotImplementedError:
-        print("Delaunay method not implemented yet!")
-
-def run_multiple_files():
-    """Test with multiple GPX files"""
-    print("Running Multiple Files with Linear Interpolation")
-    print("=" * 50)
-    
-    gpx_files = [
-        'Data/Track2_24_4_2025.gpx',
-        'Data/Track1_24_4_2025.gpx'
-    ]
-    
-    pipeline = MappingPipeline()
-    pipeline.load_data(gpx_files, is_multiple=True)
-    pipeline.preprocess_data()
-    pipeline.visualize_3d_original()
-    pipeline.create_interpolation_grid(grid_size=25)  # Slightly bigger grid for more data
-    pipeline.interpolate_data(method='linear')
-    pipeline.visualize_contour_2d()
-    pipeline.visualize_contour_3d()
+from modules.menu_system import get_user_choices
+from modules.pipeline_controller import run_pipeline, run_method_comparison
 
 def main():
-    """Main function with method selection menu"""
-    print("Mapping Project - Method Selection")
-    print("=" * 40)
-    print("1. Linear Interpolation (current working method)")
-    print("2. Delaunay Triangulation (experimental)")
-    print("3. Multiple GPX files")
-    print("4. Exit")
-    
+    """Main entry point - coordinates UI and business logic"""
     while True:
-        choice = input("\nSelect method (1-4): ").strip()
+        # Get user choices from UI
+        method_or_methods, data_source, is_multiple, run_type = get_user_choices()
         
-        if choice == '1':
-            run_linear_interpolation()
+        if run_type == 'exit':
+            print("Goodbye!")
             break
-        elif choice == '2':
-            run_delaunay_triangulation()
+        elif run_type == 'single':
+            # Run single method
+            success = run_pipeline(method_or_methods, data_source, is_multiple)
+            if success:
+                print("\nPipeline completed successfully!")
+            else:
+                print("\nPipeline failed. Please try again.")
+        elif run_type == 'comparison':
+            # Run method comparison
+            results = run_method_comparison(data_source, is_multiple, method_or_methods)
+            print(f"\nComparison completed. {sum(results.values())} out of {len(results)} methods succeeded.")
+        
+        # Ask if user wants to continue
+        print("\n" + "="*50)
+        continue_choice = input("Would you like to run another analysis? (y/n): ").strip().lower()
+        if continue_choice not in ['y', 'yes']:
+            print("Goodbye!")
             break
-        elif choice == '3':
-            run_multiple_files()
-            break
-        elif choice == '4':
-            print("Exiting...")
-            break
-        else:
-            print("Invalid choice. Please enter 1-4.")
 
 if __name__ == "__main__":
     main()
