@@ -6,12 +6,13 @@ from modules.interpolation import create_grid, interpolate_elevation
 def main():
     # Step 1: Load data
     lats, lons, alts = load_gpx_data('Data/Track2_24_4_2025.gpx')
-    # combined data pipeline
-    #gpx_files = [
-    #    'Data/Track2_24_4_2025.gpx',
-    #    'Data/Track1_24_4_2025.gpx'
-    #]
-    #lats, lons, alts = load_multiple_gpx(gpx_files)
+    """ combined data pipeline
+    gpx_files = [
+        'Data/Track2_24_4_2025.gpx',
+        'Data/Track1_24_4_2025.gpx'
+    ]
+    lats, lons, alts = load_multiple_gpx(gpx_files)
+    """
     print(f"Number of GPS points: {len(lats)}") # print number of gps samples
 
     # Step 2: Normalize elevation
@@ -34,15 +35,15 @@ def main():
     # Step 6: Interpolate elevation
     zi = interpolate_elevation(x, y, z, xi, yi)
     print(f"Interpolated elevation range: {np.nanmin(zi):.1f} to {np.nanmax(zi):.1f} meters") # interpolation elevation range
-
-    #print(f"GPS X range: {min(x):.1f} to {max(x):.1f}")
-    #print(f"GPS Y range: {min(y):.1f} to {max(y):.1f}")
-    #print(f"Grid X range: {xi.min():.1f} to {xi.max():.1f}")     
-    #print(f"Grid Y range: {yi.min():.1f} to {yi.max():.1f}")     
-    #print(f"Grid has NaN values: {np.isnan(zi).sum()} out of {zi.size}")
+    """
+    print(f"GPS X range: {min(x):.1f} to {max(x):.1f}")
+    print(f"GPS Y range: {min(y):.1f} to {max(y):.1f}")
+    print(f"Grid X range: {xi.min():.1f} to {xi.max():.1f}")     
+    print(f"Grid Y range: {yi.min():.1f} to {yi.max():.1f}")     
+    print(f"Grid has NaN values: {np.isnan(zi).sum()} out of {zi.size}")
     # these prints commands where used for debugging, edges weren't rendering, so wanted
     # to see how many NaN values return
-
+    """
     # Step 7: Create contour plot, takes optionl arguments for gps data scattering x,y. z if we want gps points colored by elevation
     create_contour_plot(xi, yi, zi, x, y)
     # create_3d_contour take optional params of the orignal gps coord, x,y,z
