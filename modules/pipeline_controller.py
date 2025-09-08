@@ -3,34 +3,59 @@ Pipeline Controller - handles all business logic for running mapping pipelines
 """
 from .mapping_pipeline import MappingPipeline
 
+def run_interpolation_pipeline(pipeline, method, grid_size):
+    """Execute interpolation-specific pipeline workflow"""
+    pipeline.visualize_3d_original()
+    pipeline.create_interpolation_grid(grid_size=grid_size)
+    pipeline.interpolate_data(method=method)
+    pipeline.visualize_contour_2d()
+    pipeline.visualize_contour_3d()
+    print(f"\n{method} interpolation completed successfully!")
+
+def run_delaunay_pipeline(pipeline, method):
+    """Execute Delaunay triangulation-specific pipeline workflow"""
+    pipeline.visualize_3d_original()
+    # TODO: Add Delaunay-specific steps when implementation is ready
+    # - Create triangular mesh
+    # - Apply triangulation algorithm  
+    # - Generate mesh-based visualizations
+    raise NotImplementedError(f"{method} triangulation not yet implemented")
+
 def run_pipeline(method, data_source, is_multiple, grid_size=20):
     """Execute a mapping pipeline with the specified method and data"""
     if data_source is None:
         print("No data source selected.")
         return False
         
-    print(f"\nRunning {method} interpolation...")
+    # Determine pipeline type based on method
+    if method in ['linear', 'cubic', 'nearest']:
+        pipeline_type = "interpolation"
+    elif method == 'delaunay':
+        pipeline_type = "triangulation"
+    else:
+        print(f"Unknown method: {method}")
+        return False
+        
+    print(f"\nRunning {method} {pipeline_type}...")
     print("=" * 50)
     
     try:
-        # Create and configure pipeline
+        # Shared setup for all methods
         pipeline = MappingPipeline()
         pipeline.load_data(data_source, is_multiple)
         pipeline.preprocess_data()
         
-        # Visualization and processing
-        pipeline.visualize_3d_original()
-        pipeline.create_interpolation_grid(grid_size=grid_size)
-        pipeline.interpolate_data(method=method)
-        pipeline.visualize_contour_2d()
-        pipeline.visualize_contour_3d()
-        
-        print(f"\n{method} interpolation completed successfully!")
+        # Route to method-specific pipeline
+        if pipeline_type == "interpolation":
+            run_interpolation_pipeline(pipeline, method, grid_size)
+        elif pipeline_type == "triangulation":
+            run_delaunay_pipeline(pipeline, method)
+            
         return True
         
     except NotImplementedError as e:
-        print(f"\nError: {method} method not implemented yet!")
-        print("Available methods: standard interpolation")
+        print(f"\nError: {e}")
+        print("Available methods: linear, cubic, nearest interpolation")
         return False
     except Exception as e:
         print(f"\nError running pipeline: {e}")

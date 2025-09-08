@@ -173,10 +173,10 @@ def get_user_choices():
     # Get data source
     data_source, is_multiple = choose_data_source()
     
-    # Get grid size for interpolation methods
+    # Get grid size for interpolation methods only
     if method in ['linear', 'cubic', 'nearest']:
         grid_size = get_grid_size()
     else:
-        grid_size = 20  # Default for other methods
+        grid_size = None  # Not needed for non-interpolation methods
     
     return method, data_source, is_multiple, grid_size
