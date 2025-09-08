@@ -3,7 +3,7 @@ Pipeline Controller - handles all business logic for running mapping pipelines
 """
 from .mapping_pipeline import MappingPipeline
 
-def run_pipeline(method, data_source, is_multiple):
+def run_pipeline(method, data_source, is_multiple, grid_size=20):
     """Execute a mapping pipeline with the specified method and data"""
     if data_source is None:
         print("No data source selected.")
@@ -20,7 +20,7 @@ def run_pipeline(method, data_source, is_multiple):
         
         # Visualization and processing
         pipeline.visualize_3d_original()
-        pipeline.create_interpolation_grid(grid_size=20)
+        pipeline.create_interpolation_grid(grid_size=grid_size)
         pipeline.interpolate_data(method=method)
         pipeline.visualize_contour_2d()
         pipeline.visualize_contour_3d()

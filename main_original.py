@@ -13,7 +13,7 @@ def main():
     ]
     lats, lons, alts = load_multiple_gpx(gpx_files)
     """
-    print(f"Number of GPS points: {len(lats)}") # print number of gps samples
+    print(f"Number of GPS points: {len(lats)}") # Print number of gps samples
 
     # Step 2: Normalize elevation
     alts = normalize_elevation(alts)
@@ -41,12 +41,12 @@ def main():
     print(f"Grid X range: {xi.min():.1f} to {xi.max():.1f}")     
     print(f"Grid Y range: {yi.min():.1f} to {yi.max():.1f}")     
     print(f"Grid has NaN values: {np.isnan(zi).sum()} out of {zi.size}")
-    # these prints commands where used for debugging, edges weren't rendering, so wanted
+    # These prints commands where used for debugging, edges weren't rendering, so wanted
     # to see how many NaN values return
     """
     # Step 7: Create contour plot, takes optionl arguments for gps data scattering x,y. z if we want gps points colored by elevation
     create_contour_plot(xi, yi, zi, x, y)
-    # create_3d_contour take optional params of the orignal gps coord, x,y,z
+    # Create_3d_contour take optional params of the orignal gps coord, x,y,z
     # in order to plot them on the mesh
     create_3d_contour(xi, yi, zi, x, y, z)
 

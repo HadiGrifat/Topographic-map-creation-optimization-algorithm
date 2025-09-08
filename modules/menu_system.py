@@ -147,6 +147,18 @@ def choose_method():
         except ValueError:
             print("Please enter a valid number")
 
+def get_grid_size():
+    """Get desired grid size from user"""
+    while True:
+        try:
+            grid_size = int(input("\nEnter desired grid size (e.g., 20 for 20x20 grid): "))
+            if grid_size > 0:
+                return grid_size
+            else:
+                print("Grid size must be a positive number")
+        except ValueError:
+            print("Please enter a valid number")
+
 def get_user_choices():
     """Get all user choices and return them"""
     print("Mapping Project - Interactive Pipeline")
@@ -156,9 +168,15 @@ def get_user_choices():
     method = choose_method()
     
     if method is None:
-        return None, None, None
+        return None, None, None, None
     
     # Get data source
     data_source, is_multiple = choose_data_source()
     
-    return method, data_source, is_multiple
+    # Get grid size for interpolation methods
+    if method in ['linear', 'cubic', 'nearest']:
+        grid_size = get_grid_size()
+    else:
+        grid_size = 20  # Default for other methods
+    
+    return method, data_source, is_multiple, grid_size
