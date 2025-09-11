@@ -49,14 +49,7 @@ class MappingPipeline:
         
     def interpolate_data(self, method='linear'):
         """Interpolate elevation data using specified method"""
-        if method in ['linear', 'cubic', 'nearest']:
-            self.zi = interpolate_elevation(self.x, self.y, self.z, self.xi, self.yi, method=method)
-        elif method == 'delaunay':
-            # Placeholder for future implementation
-            raise NotImplementedError("Delaunay triangulation method not yet implemented")
-        else:
-            raise ValueError(f"Unknown interpolation method: {method}")
-            
+        self.zi = interpolate_elevation(self.x, self.y, self.z, self.xi, self.yi, method=method)
         print(f"Interpolated elevation range: {np.nanmin(self.zi):.1f} to {np.nanmax(self.zi):.1f} meters")
         
     def visualize_3d_original(self):

@@ -64,7 +64,7 @@ def get_available_methods():
     """Return list of available mapping methods"""
     return [
         ('interpolation', 'Interpolation'),
-        ('delaunay', 'Delaunay Triangulation (experimental)')
+        ('delaunay', 'Delaunay Triangulation')
     ]
 
 def get_available_interpolations():
