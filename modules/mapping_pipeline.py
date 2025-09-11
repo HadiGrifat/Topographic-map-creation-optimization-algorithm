@@ -1,7 +1,8 @@
 import numpy as np
 from .data_processing import load_gpx_data, load_multiple_gpx, normalize_elevation, coord_transform
-from .visualization import plot_3D, create_contour_plot, create_3d_contour
+from .visualization import plot_3D, create_contour_plot, create_3d_contour, visualize_triangular_mesh, visualize_wireframe
 from .interpolation import create_grid, interpolate_elevation
+from .delaunay_triangulation import create_triangulation
 
 class MappingPipeline:
     def __init__(self):
@@ -19,6 +20,11 @@ class MappingPipeline:
         self.xi = None
         self.yi = None
         self.zi = None
+        
+        # Triangulation data
+        self.triangulation = None
+        self.triangles = None
+        self.num_triangles = None
         
     def load_data(self, data_source, is_multiple=False):
         """Load GPS data from single file or multiple files"""
@@ -70,3 +76,21 @@ class MappingPipeline:
             create_3d_contour(self.xi, self.yi, self.zi, self.x, self.y, self.z)
         else:
             create_3d_contour(self.xi, self.yi, self.zi)
+            
+    def create_triangulation(self):
+        """Create Delaunay triangulation from GPS data"""
+        self.triangulation, self.triangles, self.num_triangles = create_triangulation(self.x, self.y, self.z)
+        
+    def visualize_triangular_mesh(self):
+        """Display 3D triangular mesh with colored surface"""
+        if self.triangles is not None:
+            visualize_triangular_mesh(self.x, self.y, self.z, self.triangles)
+        else:
+            raise ValueError("No triangulation data available. Call create_triangulation() first.")
+            
+    def visualize_wireframe(self):
+        """Display wireframe view showing triangle structure"""
+        if self.triangles is not None:
+            visualize_wireframe(self.x, self.y, self.z, self.triangles)
+        else:
+            raise ValueError("No triangulation data available. Call create_triangulation() first.")

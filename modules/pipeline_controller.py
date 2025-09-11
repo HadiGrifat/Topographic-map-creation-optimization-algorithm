@@ -15,11 +15,10 @@ def run_interpolation_pipeline(pipeline, method, grid_size):
 def run_delaunay_pipeline(pipeline, method):
     """Execute Delaunay triangulation-specific pipeline workflow"""
     pipeline.visualize_3d_original()
-    # TODO: Add Delaunay-specific steps when implementation is ready
-    # - Create triangular mesh
-    # - Apply triangulation algorithm  
-    # - Generate mesh-based visualizations
-    raise NotImplementedError(f"{method} triangulation not yet implemented")
+    pipeline.create_triangulation()
+    pipeline.visualize_triangular_mesh()
+    pipeline.visualize_wireframe()
+    print(f"\n{method} triangulation completed successfully!")
 
 def run_pipeline(method, data_source, is_multiple, grid_size=20):
     """Execute a mapping pipeline with the specified method and data"""
