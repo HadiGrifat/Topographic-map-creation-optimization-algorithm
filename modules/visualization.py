@@ -1,6 +1,12 @@
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
+def vertical_exaggeration_ratio(x, y, z, vertical_exaggeration=3):
+    x_range = max(x) - min(x)
+    y_range = max(y) - min(y) 
+    z_range = max(z) - min(z)
+    return [x_range, y_range, z_range * vertical_exaggeration]
+
 def plot_3D(lats, lons, alts):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -37,69 +43,71 @@ def create_contour_plot(xi, yi, zi, x_gps=None, y_gps=None, z_gps=None):
     plt.axis('equal')
     plt.show()
 
-# def create_3d_contour(xi, yi, zi, x_gps=None, y_gps=None, z_gps=None):
-#     surface = go.Surface( # create mesh surface from 3d data, x,y are 2d grids and z give elevation
-#         x = xi,           # data at each intersection
-#         y = yi,
-#         z= zi,
-#         colorscale='earth',
-#         showscale=True,
-#         contours=dict( # make contour lines show up on mesh
-#             z=dict(
-#                 show=True,
-#                 usecolormap=False,
-#                 #color="red", # contour lines color, default = black
-#                 highlightcolor="red", # highlight color
-#                 project_z=False, # project on xy plane
-#                 width=3, # width if lines
-#                 size=2, # spacing, every x meters
-#                 start=0, # start lines at elevation x
-#                 end=35 # end lines at elevation x
-#             )
-#         )
-#     )
-#     # adding gps data to the 3d mesh
-#     if x_gps is not None and y_gps is not None and z_gps is not None:
-#         gps_points = go.Scatter3d(
-#             x = x_gps,
-#             y = y_gps,
-#             z = z_gps,
-#             mode = "markers",
-#             marker=dict(
-#                 size=3,
-#                 color="red",
-#                 symbol="circle"
-#             ),
-#             name='GPS Sample Points'
-#         )
-#         fig = go.Figure(data=[surface, gps_points])
-#     else:
-#         fig = go.Figure(data=[surface]) # create figure
-#         
-#     fig.update_layout(  # set up the scene for the figure create a line above, layout settings
-#         title = '3D Topographic Contour Map',
-#         scene = dict(
-#             xaxis_title = 'X (m)',
-#             yaxis_title = 'Y (m)',
-#             zaxis_title = 'Elevation (m)',
-#             camera = dict(
-#                 eye = dict(x=0, y=-1.5, z=0.5), # starting orientation looking north (negative y)
-#                 # alternatives: x=1, y=1, z=0.8 isometric view
-#                 # x=0, y=0, z=2 top down view
-#                 up = dict(x=0, y=0, z=1) # z axis looking up
-#             )),
-#             # adding a rest button for orientation
-#         updatemenus = [dict( # create interactive UI element
-#             type = "buttons", # type of UI element wanted
-#             buttons = [dict(label="Reset View", #label: text that appear on button
-#                             method="relayout", # what action is done when button is pressed, relayout changes plot layout/styling
-#                             args=["scene.camera", # what specificaly to change
-#                                     dict(eye=dict(x=0, y=-1.5, z=0.5))])]
-#         )]
-#     )
-#     fig.show()
-
+'''
 def create_3d_contour(xi, yi, zi, x_gps=None, y_gps=None, z_gps=None):
+    surface = go.Surface( # create mesh surface from 3d data, x,y are 2d grids and z give elevation
+        x = xi,           # data at each intersection
+        y = yi,
+        z= zi,
+        colorscale='earth',
+        showscale=True,
+        contours=dict( # make contour lines show up on mesh
+            z=dict(
+                show=True,
+                usecolormap=False,
+                #color="red", # contour lines color, default = black
+                highlightcolor="red", # highlight color
+                project_z=False, # project on xy plane
+                width=3, # width if lines
+                size=2, # spacing, every x meters
+                start=0, # start lines at elevation x
+                end=35 # end lines at elevation x
+            )
+        )
+    )
+    # adding gps data to the 3d mesh
+    if x_gps is not None and y_gps is not None and z_gps is not None:
+        gps_points = go.Scatter3d(
+            x = x_gps,
+            y = y_gps,
+            z = z_gps,
+            mode = "markers",
+            marker=dict(
+                size=3,
+                color="red",
+                symbol="circle"
+            ),
+            name='GPS Sample Points'
+        )
+        fig = go.Figure(data=[surface, gps_points])
+    else:
+        fig = go.Figure(data=[surface]) # create figure
+        
+    fig.update_layout(  # set up the scene for the figure create a line above, layout settings
+        title = '3D Topographic Contour Map',
+        scene = dict(
+            xaxis_title = 'X (m)',
+            yaxis_title = 'Y (m)',
+            zaxis_title = 'Elevation (m)',
+            camera = dict(
+                eye = dict(x=0, y=-1.5, z=0.5), # starting orientation looking north (negative y)
+                # alternatives: x=1, y=1, z=0.8 isometric view
+                # x=0, y=0, z=2 top down view
+                up = dict(x=0, y=0, z=1) # z axis looking up
+            )),
+            # adding a rest button for orientation
+        updatemenus = [dict( # create interactive UI element
+            type = "buttons", # type of UI element wanted
+            buttons = [dict(label="Reset View", #label: text that appear on button
+                            method="relayout", # what action is done when button is pressed, relayout changes plot layout/styling
+                            args=["scene.camera", # what specificaly to change
+                                    dict(eye=dict(x=0, y=-1.5, z=0.5))])]
+        )]
+    )
+    fig.show()
+'''
+
+def create_3d_contour(xi, yi, zi, x_gps=None, y_gps=None, z_gps=None, vertical_exaggeration=3):
     fig = plt.figure(figsize=(12, 8))
     ax = fig.add_subplot(111, projection='3d')
     
@@ -137,18 +145,14 @@ def create_3d_contour(xi, yi, zi, x_gps=None, y_gps=None, z_gps=None):
     # Set viewing angle similar to Plotly
     ax.view_init(elev=20, azim=45)
     
+    # Set proper aspect ratio - prevent unrealistic vertical exaggeration
+    if x_gps is not None and y_gps is not None and z_gps is not None:
+        ax.set_box_aspect(vertical_exaggeration_ratio(x_gps, y_gps, z_gps, vertical_exaggeration))
+    
     plt.tight_layout()
     plt.show()
 
-def visualize_triangular_mesh(x, y, z, triangles, title_suffix=""):
-    """
-    Display 3D triangular mesh with colored surface
-    
-    Args:
-        x, y, z: Coordinate and elevation arrays
-        triangles: Triangle indices from triangulation
-        title_suffix: Additional text for plot title
-    """
+def visualize_triangular_mesh(x, y, z, triangles, title_suffix="", vertical_exaggeration=3):
     fig = plt.figure(figsize=(14, 10))
     ax = fig.add_subplot(111, projection='3d')
     
@@ -173,25 +177,12 @@ def visualize_triangular_mesh(x, y, z, triangles, title_suffix=""):
     ax.view_init(elev=30, azim=45)
     
     # Set proper aspect ratio - prevent unrealistic vertical exaggeration
-    # Use 3x vertical exaggeration for better visibility while keeping realistic proportions
-    x_range = max(x) - min(x)
-    y_range = max(y) - min(y) 
-    z_range = max(z) - min(z)
-    vertical_exaggeration = 3
-    ax.set_box_aspect([x_range, y_range, z_range * vertical_exaggeration])
+    ax.set_box_aspect(vertical_exaggeration_ratio(x, y, z, vertical_exaggeration))
     
     plt.tight_layout()
     plt.show()
 
-def visualize_wireframe(x, y, z, triangles, title_suffix=""):
-    """
-    Display wireframe view showing triangle structure
-    
-    Args:
-        x, y, z: Coordinate and elevation arrays  
-        triangles: Triangle indices from triangulation
-        title_suffix: Additional text for plot title
-    """
+def visualize_wireframe(x, y, z, triangles, title_suffix="", vertical_exaggeration=3):
     fig = plt.figure(figsize=(14, 10))
     ax = fig.add_subplot(111, projection='3d')
     
@@ -210,12 +201,7 @@ def visualize_wireframe(x, y, z, triangles, title_suffix=""):
     ax.view_init(elev=30, azim=45)
     
     # Set proper aspect ratio - prevent unrealistic vertical exaggeration
-    # Use 3x vertical exaggeration for better visibility while keeping realistic proportions
-    x_range = max(x) - min(x)
-    y_range = max(y) - min(y) 
-    z_range = max(z) - min(z)
-    vertical_exaggeration = 3
-    ax.set_box_aspect([x_range, y_range, z_range * vertical_exaggeration])
+    ax.set_box_aspect(vertical_exaggeration_ratio(x, y, z, vertical_exaggeration))
     
     plt.tight_layout()
     plt.show()
