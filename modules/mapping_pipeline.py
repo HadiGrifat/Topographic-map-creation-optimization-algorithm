@@ -70,27 +70,27 @@ class MappingPipeline:
         else:
             create_contour_plot(self.xi, self.yi, self.zi)
             
-    def visualize_contour_3d(self, show_gps_points=True):
+    def visualize_contour_3d(self, show_gps_points=True, vertical_exaggeration=3):
         """Create 3D contour plot"""  
         if show_gps_points:
-            create_3d_contour(self.xi, self.yi, self.zi, self.x, self.y, self.z)
+            create_3d_contour(self.xi, self.yi, self.zi, self.x, self.y, self.z, vertical_exaggeration)
         else:
-            create_3d_contour(self.xi, self.yi, self.zi)
+            create_3d_contour(self.xi, self.yi, self.zi, vertical_exaggeration=vertical_exaggeration)
             
     def create_triangulation(self):
         """Create Delaunay triangulation from GPS data"""
         self.triangulation, self.triangles, self.num_triangles = create_triangulation(self.x, self.y, self.z)
         
-    def visualize_triangular_mesh(self):
+    def visualize_triangular_mesh(self, vertical_exaggeration=3):
         """Display 3D triangular mesh with colored surface"""
         if self.triangles is not None:
-            visualize_triangular_mesh(self.x, self.y, self.z, self.triangles)
+            visualize_triangular_mesh(self.x, self.y, self.z, self.triangles, vertical_exaggeration=vertical_exaggeration)
         else:
             raise ValueError("No triangulation data available. Call create_triangulation() first.")
             
-    def visualize_wireframe(self):
+    def visualize_wireframe(self, vertical_exaggeration=3):
         """Display wireframe view showing triangle structure"""
         if self.triangles is not None:
-            visualize_wireframe(self.x, self.y, self.z, self.triangles)
+            visualize_wireframe(self.x, self.y, self.z, self.triangles, vertical_exaggeration=vertical_exaggeration)
         else:
             raise ValueError("No triangulation data available. Call create_triangulation() first.")

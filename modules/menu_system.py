@@ -159,6 +159,24 @@ def get_grid_size():
         except ValueError:
             print("Please enter a valid number")
 
+def get_vertical_exaggeration():
+    """Get vertical exaggeration factor from user"""
+    print("\nVertical Exaggeration Settings:")
+    print("=" * 35)
+    print("• 1.0 = True scale (may appear flat)")
+    print("• 3.0 = Realistic view (recommended)")
+    print("• >10 = Dramatic exaggeration")
+    
+    while True:
+        try:
+            exaggeration = float(input("\nEnter vertical exaggeration factor (default: 3.0): ") or "3.0")
+            if exaggeration > 0:
+                return exaggeration
+            else:
+                print("Vertical exaggeration must be a positive number")
+        except ValueError:
+            print("Please enter a valid number")
+
 def get_user_choices():
     """Get all user choices and return them"""
     print("Mapping Project - Interactive Pipeline")
@@ -168,7 +186,7 @@ def get_user_choices():
     method = choose_method()
     
     if method is None:
-        return None, None, None, None
+        return None, None, None, None, None
     
     # Get data source
     data_source, is_multiple = choose_data_source()
@@ -179,4 +197,7 @@ def get_user_choices():
     else:
         grid_size = None  # Not needed for non-interpolation methods
     
-    return method, data_source, is_multiple, grid_size
+    # Get vertical exaggeration for all 3D visualizations
+    vertical_exaggeration = get_vertical_exaggeration()
+    
+    return method, data_source, is_multiple, grid_size, vertical_exaggeration

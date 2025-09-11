@@ -3,24 +3,24 @@ Pipeline Controller - handles all business logic for running mapping pipelines
 """
 from .mapping_pipeline import MappingPipeline
 
-def run_interpolation_pipeline(pipeline, method, grid_size):
+def run_interpolation_pipeline(pipeline, method, grid_size, vertical_exaggeration):
     """Execute interpolation-specific pipeline workflow"""
     pipeline.visualize_3d_original()
     pipeline.create_interpolation_grid(grid_size=grid_size)
     pipeline.interpolate_data(method=method)
     pipeline.visualize_contour_2d()
-    pipeline.visualize_contour_3d()
+    pipeline.visualize_contour_3d(vertical_exaggeration=vertical_exaggeration)
     print(f"\n{method} interpolation completed successfully!")
 
-def run_delaunay_pipeline(pipeline, method):
+def run_delaunay_pipeline(pipeline, method, vertical_exaggeration):
     """Execute Delaunay triangulation-specific pipeline workflow"""
     pipeline.visualize_3d_original()
     pipeline.create_triangulation()
-    pipeline.visualize_triangular_mesh()
-    pipeline.visualize_wireframe()
+    pipeline.visualize_triangular_mesh(vertical_exaggeration=vertical_exaggeration)
+    pipeline.visualize_wireframe(vertical_exaggeration=vertical_exaggeration)
     print(f"\n{method} triangulation completed successfully!")
 
-def run_pipeline(method, data_source, is_multiple, grid_size=20):
+def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exaggeration=3):
     """Execute a mapping pipeline with the specified method and data"""
     if data_source is None:
         print("No data source selected.")
@@ -46,9 +46,9 @@ def run_pipeline(method, data_source, is_multiple, grid_size=20):
         
         # Route to method-specific pipeline
         if pipeline_type == "interpolation":
-            run_interpolation_pipeline(pipeline, method, grid_size)
+            run_interpolation_pipeline(pipeline, method, grid_size, vertical_exaggeration)
         elif pipeline_type == "triangulation":
-            run_delaunay_pipeline(pipeline, method)
+            run_delaunay_pipeline(pipeline, method, vertical_exaggeration)
             
         return True
         
