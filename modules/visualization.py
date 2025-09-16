@@ -152,7 +152,7 @@ def create_3d_contour(xi, yi, zi, x_gps=None, y_gps=None, z_gps=None, vertical_e
     plt.tight_layout()
     plt.show()
 
-def visualize_triangular_mesh(x, y, z, triangles, title_suffix="", vertical_exaggeration=3):
+def render_triangular_mesh(x, y, z, triangles, title_suffix="", vertical_exaggeration=3):
     fig = plt.figure(figsize=(14, 10))
     ax = fig.add_subplot(111, projection='3d')
     
@@ -182,7 +182,7 @@ def visualize_triangular_mesh(x, y, z, triangles, title_suffix="", vertical_exag
     plt.tight_layout()
     plt.show()
 
-def visualize_wireframe(x, y, z, triangles, title_suffix="", vertical_exaggeration=3):
+def render_wireframe_view(x, y, z, triangles, title_suffix="", vertical_exaggeration=3):
     fig = plt.figure(figsize=(14, 10))
     ax = fig.add_subplot(111, projection='3d')
     

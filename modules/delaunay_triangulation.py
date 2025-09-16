@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial import Delaunay
 
-def create_triangulation(x, y, z):
+def build_delaunay_triangulation(x, y, z):
     """
     Create Delaunay triangulation from 2D coordinates
     

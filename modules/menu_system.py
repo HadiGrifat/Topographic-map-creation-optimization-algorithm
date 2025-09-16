@@ -2,7 +2,6 @@
 Menu system for mapping project - handles ONLY user interface logic
 """
 import os
-from .pipeline_controller import get_available_methods, get_available_interpolations
 
 def get_available_gpx_files():
     """Scan Data folder for all .gpx files"""
@@ -101,49 +100,66 @@ def choose_data_source():
 
 def choose_interpolation_method():
     """Let user choose specific interpolation method"""
-    methods = get_available_interpolations()
-    
     print("\nInterpolation Methods:")
     print("=" * 30)
-    for i, (method_key, method_name) in enumerate(methods, 1):
-        print(f"{i}. {method_name}")
-    
+    print("1. Linear Interpolation")
+    print("2. Cubic Interpolation")
+    print("3. Nearest Value Interpolation")
+
     while True:
         try:
-            choice = int(input(f"\nSelect interpolation method (1-{len(methods)}): "))
-            if 1 <= choice <= len(methods):
-                return methods[choice - 1][0]  # Return method key ('linear', 'cubic', 'nearest')
+            choice = int(input("\nSelect interpolation method (1-3): "))
+            if choice == 1:
+                return 'linear'
+            elif choice == 2:
+                return 'cubic'
+            elif choice == 3:
+                return 'nearest'
             else:
-                print(f"Please enter a number between 1 and {len(methods)}")
+                print("Please enter a number between 1 and 3")
+        except ValueError:
+            print("Please enter a valid number")
+
+def choose_delaunay_option():
+    """Let user choose between mesh creation or analytics for Delaunay triangulation"""
+    print("\nDelaunay Triangulation Options:")
+    print("=" * 35)
+    print("1. Create Mesh (3D visualization)")
+    print("2. Triangle Analytics (quality analysis)")
+
+    while True:
+        try:
+            choice = int(input("\nSelect option (1-2): "))
+            if choice == 1:
+                return 'delaunay_mesh'
+            elif choice == 2:
+                return 'delaunay_analytics'
+            else:
+                print("Please enter 1 or 2")
         except ValueError:
             print("Please enter a valid number")
 
 def choose_method():
-    """Let user choose interpolation method"""
-    methods = get_available_methods()
-    
+    """Let user choose mapping method"""
     print("\nMethod Selection:")
     print("=" * 30)
-    for i, (method_key, method_name) in enumerate(methods, 1):
-        print(f"{i}. {method_name}")
-    print(f"{len(methods) + 1}. Exit")
-    
+    print("1. Interpolation")
+    print("2. Delaunay Triangulation")
+    print("3. Exit")
+
     while True:
         try:
-            choice = int(input(f"\nSelect option (1-{len(methods) + 1}): "))
-            if 1 <= choice <= len(methods):
-                method_key = methods[choice - 1][0]  # Get the category key
-                
-                if method_key == 'interpolation':
-                    # Show interpolation submenu
-                    return choose_interpolation_method()
-                elif method_key == 'delaunay':
-                    return 'delaunay'
-                    
-            elif choice == len(methods) + 1:
+            choice = int(input("\nSelect option (1-3): "))
+            if choice == 1:
+                # Show interpolation submenu
+                return choose_interpolation_method()
+            elif choice == 2:
+                # Show Delaunay submenu
+                return choose_delaunay_option()
+            elif choice == 3:
                 return None  # Exit
             else:
-                print(f"Please enter a number between 1 and {len(methods) + 1}")
+                print("Please enter a number between 1 and 3")
         except ValueError:
             print("Please enter a valid number")
 

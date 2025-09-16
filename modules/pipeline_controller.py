@@ -2,6 +2,7 @@
 Pipeline Controller - handles all business logic for running mapping pipelines
 """
 from .mapping_pipeline import MappingPipeline
+from .analytics import analyze_triangulation_quality
 
 def run_interpolation_pipeline(pipeline, method, grid_size, vertical_exaggeration):
     """Execute interpolation-specific pipeline workflow"""
@@ -12,13 +13,25 @@ def run_interpolation_pipeline(pipeline, method, grid_size, vertical_exaggeratio
     pipeline.visualize_contour_3d(vertical_exaggeration=vertical_exaggeration)
     print(f"\n{method} interpolation completed successfully!")
 
-def run_delaunay_pipeline(pipeline, method, vertical_exaggeration):
-    """Execute Delaunay triangulation-specific pipeline workflow"""
+def run_delaunay_mesh_pipeline(pipeline, method, vertical_exaggeration):
+    """Execute Delaunay triangulation mesh creation workflow"""
     pipeline.visualize_3d_original()
     pipeline.create_triangulation()
     pipeline.visualize_triangular_mesh(vertical_exaggeration=vertical_exaggeration)
     pipeline.visualize_wireframe(vertical_exaggeration=vertical_exaggeration)
-    print(f"\n{method} triangulation completed successfully!")
+    print(f"\n{method} mesh creation completed successfully!")
+
+def run_delaunay_analytics_pipeline(pipeline, method, vertical_exaggeration):
+    """Execute Delaunay triangulation analytics workflow"""
+    pipeline.visualize_3d_original()
+    pipeline.create_triangulation()
+
+    # Perform triangle quality analysis
+    triangulation = pipeline.triangulation
+    points_2d = pipeline.points_2d
+    print("\nPerforming triangle quality analysis...")
+    fatness_ratios, triangle_stats = analyze_triangulation_quality(triangulation, points_2d)
+    print(f"\n{method} analytics completed successfully!")
 
 def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exaggeration=3):
     """Execute a mapping pipeline with the specified method and data"""
@@ -29,8 +42,10 @@ def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exagge
     # Determine pipeline type based on method
     if method in ['linear', 'cubic', 'nearest']:
         pipeline_type = "interpolation"
-    elif method == 'delaunay':
-        pipeline_type = "triangulation"
+    elif method == 'delaunay_mesh':
+        pipeline_type = "delaunay_mesh"
+    elif method == 'delaunay_analytics':
+        pipeline_type = "delaunay_analytics"
     else:
         print(f"Unknown method: {method}")
         return False
@@ -47,8 +62,10 @@ def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exagge
         # Route to method-specific pipeline
         if pipeline_type == "interpolation":
             run_interpolation_pipeline(pipeline, method, grid_size, vertical_exaggeration)
-        elif pipeline_type == "triangulation":
-            run_delaunay_pipeline(pipeline, method, vertical_exaggeration)
+        elif pipeline_type == "delaunay_mesh":
+            run_delaunay_mesh_pipeline(pipeline, method, vertical_exaggeration)
+        elif pipeline_type == "delaunay_analytics":
+            run_delaunay_analytics_pipeline(pipeline, method, vertical_exaggeration)
             
         return True
         
@@ -60,18 +77,4 @@ def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exagge
         print(f"\nError running pipeline: {e}")
         return False
 
-def get_available_methods():
-    """Return list of available mapping methods"""
-    return [
-        ('interpolation', 'Interpolation'),
-        ('delaunay', 'Delaunay Triangulation')
-    ]
-
-def get_available_interpolations():
-    """Return list of available interpolation methods"""
-    return [
-        ('linear', 'Linear Interpolation'),
-        ('cubic', 'Cubic Interpolation'),
-        ('nearest', 'Nearest Value Interpolation')
-    ]
 

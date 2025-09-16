@@ -1,8 +1,8 @@
 import numpy as np
 from .data_processing import load_gpx_data, load_multiple_gpx, normalize_elevation, coord_transform
-from .visualization import plot_3D, create_contour_plot, create_3d_contour, visualize_triangular_mesh, visualize_wireframe
+from .visualization import plot_3D, create_contour_plot, create_3d_contour, render_triangular_mesh, render_wireframe_view
 from .interpolation import create_grid, interpolate_elevation
-from .delaunay_triangulation import create_triangulation
+from .delaunay_triangulation import build_delaunay_triangulation
 
 class MappingPipeline:
     def __init__(self):
@@ -25,6 +25,7 @@ class MappingPipeline:
         self.triangulation = None
         self.triangles = None
         self.num_triangles = None
+        self.points_2d = None
         
     def load_data(self, data_source, is_multiple=False):
         """Load GPS data from single file or multiple files"""
@@ -72,18 +73,19 @@ class MappingPipeline:
             
     def create_triangulation(self):
         """Create Delaunay triangulation from GPS data"""
-        self.triangulation, self.triangles, self.num_triangles = create_triangulation(self.x, self.y, self.z)
+        self.triangulation, self.triangles, self.num_triangles = build_delaunay_triangulation(self.x, self.y, self.z)
+        self.points_2d = np.column_stack((self.x, self.y))
         
     def visualize_triangular_mesh(self, vertical_exaggeration=3):
         """Display 3D triangular mesh with colored surface"""
         if self.triangles is not None:
-            visualize_triangular_mesh(self.x, self.y, self.z, self.triangles, vertical_exaggeration=vertical_exaggeration)
+            render_triangular_mesh(self.x, self.y, self.z, self.triangles, vertical_exaggeration=vertical_exaggeration)
         else:
             raise ValueError("No triangulation data available. Call create_triangulation() first.")
             
     def visualize_wireframe(self, vertical_exaggeration=3):
         """Display wireframe view showing triangle structure"""
         if self.triangles is not None:
-            visualize_wireframe(self.x, self.y, self.z, self.triangles, vertical_exaggeration=vertical_exaggeration)
+            render_wireframe_view(self.x, self.y, self.z, self.triangles, vertical_exaggeration=vertical_exaggeration)
         else:
             raise ValueError("No triangulation data available. Call create_triangulation() first.")
