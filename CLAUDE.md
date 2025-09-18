@@ -48,10 +48,12 @@ Mapping_Project/
   - Delaunay Mesh: load → preprocess → triangulate → visualize mesh/wireframe
   - Delaunay Analytics: load → preprocess → triangulate → quality analysis → fatness visualization
 
-#### modules/mapping_pipeline.py:7-89
-- `MappingPipeline` class: Central data management
+#### modules/mapping_pipeline.py:7-101
+- `MappingPipeline` class: Central data management and operation encapsulation
 - Data flow: raw GPS → processed coordinates → grid/triangulation → visualization
 - State management for all intermediate results
+- **ARCHITECTURAL PRINCIPLE**: All pipeline operations should be implemented as methods in this class
+- Pipeline controller should NEVER directly call external functions - always use pipeline methods
 
 #### modules/data_processing.py:5-44
 - GPX file parsing (single/multiple files)
@@ -84,6 +86,54 @@ Mapping_Project/
    - Delaunay Mesh: triangulation → mesh/wireframe visualization
    - Delaunay Analytics: triangulation → quality analysis → fatness visualization
 5. **Visualization** → 3D plots with vertical exaggeration control
+
+---
+
+## Architectural Guidelines
+
+### Core Design Principles
+
+**1. Pipeline Controller Responsibility:**
+- ONLY orchestrates workflow (sequence of operations)
+- NEVER directly calls functions from other modules
+- NEVER accesses pipeline internal data directly
+- Acts as a pure workflow coordinator
+
+**2. MappingPipeline Class Responsibility:**
+- Central data management and state
+- Encapsulates ALL operations as methods
+- Provides clean interface to pipeline controller
+- Handles error checking for data dependencies
+
+**3. Adding New Operations:**
+- Step 1: Implement function in appropriate module (analytics.py, visualization.py, etc.)
+- Step 2: Create wrapper method in MappingPipeline class
+- Step 3: Add error checking and data validation in the wrapper
+- Step 4: Use the pipeline method in pipeline_controller (NEVER the original function)
+
+**4. Example Pattern:**
+```python
+# ❌ BAD - Direct function call in pipeline_controller
+from .analytics import analyze_triangulation_quality
+fatness_ratios, stats = analyze_triangulation_quality(pipeline.triangulation, pipeline.points_2d)
+
+# ✅ GOOD - Pipeline method encapsulation
+# In mapping_pipeline.py:
+def analyze_triangulation_quality(self):
+    if self.triangulation is None:
+        raise ValueError("No triangulation data available.")
+    return analyze_triangulation_quality(self.triangulation, self.points_2d)
+
+# In pipeline_controller.py:
+pipeline.analyze_triangulation_quality()
+```
+
+**5. Benefits of This Architecture:**
+- Clean separation of concerns
+- Better error handling and validation
+- Easier testing and maintenance
+- Consistent interface patterns
+- Encapsulated data access
 
 ---
 

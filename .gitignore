@@ -11,6 +11,7 @@ __pycache__/
 # OS files
 .DS_Store
 Thumbs.db
+CLAUDE.md
 
 # Results/output files (optional)
 Results/

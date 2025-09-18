@@ -2,7 +2,6 @@
 Pipeline Controller - handles all business logic for running mapping pipelines
 """
 from .mapping_pipeline import MappingPipeline
-from .analytics import analyze_triangulation_quality
 
 def run_interpolation_pipeline(pipeline, method, grid_size, vertical_exaggeration):
     """Execute interpolation-specific pipeline workflow"""
@@ -25,13 +24,17 @@ def run_delaunay_analytics_pipeline(pipeline, method, vertical_exaggeration):
     """Execute Delaunay triangulation analytics workflow"""
     pipeline.visualize_3d_original()
     pipeline.create_triangulation()
-
-    # Perform triangle quality analysis
-    triangulation = pipeline.triangulation
-    points_2d = pipeline.points_2d
-    print("\nPerforming triangle quality analysis...")
-    fatness_ratios, triangle_stats = analyze_triangulation_quality(triangulation, points_2d)
+    pipeline.analyze_triangulation_quality()
     print(f"\n{method} analytics completed successfully!")
+
+def run_delaunay_optimized_pipeline(pipeline, method, vertical_exaggeration):
+    """Execute Delaunay triangulation optimization workflow with Steiner points"""
+    pipeline.visualize_3d_original()
+    pipeline.create_triangulation()
+    pipeline.optimize_triangulation()
+    pipeline.visualize_optimized_mesh(vertical_exaggeration=vertical_exaggeration)
+    pipeline.visualize_optimized_wireframe(vertical_exaggeration=vertical_exaggeration)
+    print(f"\n{method} optimization completed successfully!")
 
 def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exaggeration=3):
     """Execute a mapping pipeline with the specified method and data"""
@@ -46,6 +49,8 @@ def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exagge
         pipeline_type = "delaunay_mesh"
     elif method == 'delaunay_analytics':
         pipeline_type = "delaunay_analytics"
+    elif method == 'delaunay_optimized':
+        pipeline_type = "delaunay_optimized"
     else:
         print(f"Unknown method: {method}")
         return False
@@ -66,7 +71,8 @@ def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exagge
             run_delaunay_mesh_pipeline(pipeline, method, vertical_exaggeration)
         elif pipeline_type == "delaunay_analytics":
             run_delaunay_analytics_pipeline(pipeline, method, vertical_exaggeration)
-            
+        elif pipeline_type == "delaunay_optimized":
+            run_delaunay_optimized_pipeline(pipeline, method, vertical_exaggeration)
         return True
         
     except NotImplementedError as e:
@@ -76,5 +82,3 @@ def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exagge
     except Exception as e:
         print(f"\nError running pipeline: {e}")
         return False
-
-

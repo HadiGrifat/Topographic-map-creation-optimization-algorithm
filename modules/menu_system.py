@@ -121,21 +121,24 @@ def choose_interpolation_method():
             print("Please enter a valid number")
 
 def choose_delaunay_option():
-    """Let user choose between mesh creation or analytics for Delaunay triangulation"""
+    """Let user choose between mesh creation, analytics, or optimized solution for Delaunay triangulation"""
     print("\nDelaunay Triangulation Options:")
-    print("=" * 35)
+    print("=" * 40)
     print("1. Create Mesh (3D visualization)")
     print("2. Triangle Analytics (quality analysis)")
+    print("3. Optimized Solution (Steiner points)")
 
     while True:
         try:
-            choice = int(input("\nSelect option (1-2): "))
+            choice = int(input("\nSelect option (1-3): "))
             if choice == 1:
                 return 'delaunay_mesh'
             elif choice == 2:
                 return 'delaunay_analytics'
+            elif choice == 3:
+                return 'delaunay_optimized'
             else:
-                print("Please enter 1 or 2")
+                print("Please enter a number between 1 and 3")
         except ValueError:
             print("Please enter a valid number")
 
