@@ -64,7 +64,6 @@ def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exagge
         pipeline.load_data(data_source, is_multiple)
         pipeline.preprocess_data()
         
-        # Route to method-specific pipeline
         if pipeline_type == "interpolation":
             run_interpolation_pipeline(pipeline, method, grid_size, vertical_exaggeration)
         elif pipeline_type == "delaunay_mesh":
