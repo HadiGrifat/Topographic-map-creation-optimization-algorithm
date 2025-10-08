@@ -41,7 +41,7 @@ def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exagge
     if data_source is None:
         print("No data source selected.")
         return False
-        
+
     # Determine pipeline type based on method
     if method in ['linear', 'cubic', 'nearest']:
         pipeline_type = "interpolation"
@@ -54,16 +54,16 @@ def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exagge
     else:
         print(f"Unknown method: {method}")
         return False
-        
+
     print(f"\nRunning {method} {pipeline_type}...")
     print("=" * 50)
-    
+
     try:
         # Shared setup for all methods
         pipeline = MappingPipeline()
         pipeline.load_data(data_source, is_multiple)
         pipeline.preprocess_data()
-        
+
         if pipeline_type == "interpolation":
             run_interpolation_pipeline(pipeline, method, grid_size, vertical_exaggeration)
         elif pipeline_type == "delaunay_mesh":
@@ -73,7 +73,7 @@ def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exagge
         elif pipeline_type == "delaunay_optimized":
             run_delaunay_optimized_pipeline(pipeline, method, vertical_exaggeration)
         return True
-        
+
     except NotImplementedError as e:
         print(f"\nError: {e}")
         print("Available methods: linear, cubic, nearest interpolation")
