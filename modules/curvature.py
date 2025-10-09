@@ -1,5 +1,39 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from .interpolation import create_grid, interpolate_elevation
+
+def visualize_curvature_heatmap(x, y, vertex_curvatures, grid_size=50, method='cubic'):
+
+    # Create interpolation grid
+    xi, yi = create_grid(x, y, grid_size)
+
+    # Interpolate curvature values onto the grid
+    curvature_interpolated = interpolate_elevation(
+        x, y, vertex_curvatures,
+        xi, yi,
+        method=method
+    )
+
+    # Create the heatmap visualization
+    plt.figure(figsize=(12, 10))
+
+    # Filled contour plot (smooth color gradient)
+    plt.contourf(xi, yi, curvature_interpolated, levels=20, cmap='YlOrRd')
+    plt.colorbar(label="Curvature (radians)")
+
+    # Optional: Add contour lines for reference
+    contour_lines = plt.contour(xi, yi, curvature_interpolated,
+                                colors='black', linewidths=0.3, alpha=0.3)
+
+    # Overlay GPS points as small dots
+    plt.scatter(x, y, c='black', s=10, alpha=0.5, edgecolors='white', linewidths=0.5)
+
+    plt.title(f"Curvature Heatmap")
+    plt.xlabel("X (m)")
+    plt.ylabel("Y (m)")
+    plt.axis('equal')
+    plt.tight_layout()
+    plt.show()
 
 def visualize_vertex_labels(points, vertex_curvatures=None, title="Vertex Labels and Positions"):
 
@@ -42,14 +76,14 @@ def compute_curvature(points, triangles):
     vertex_curvatures = []
     n_vertices = len(points)
 
-    # build vertex to triangle dicitionary
+    # vertex to triangle dicitionary
     # to map which trianges each vertex is part of
     vertex_to_triangles = {i: [] for i in range(n_vertices)}
     for triangle_id, triangle in enumerate(triangles):
         for vertex_id in triangle:
             vertex_to_triangles[vertex_id].append(triangle_id)
 
-    # Build edge-to-triangle-count mapping to identify boundary edges
+    # edge-to-triangle-count mapping to identify boundary edges
     # An edge is represented as a sorted tuple (v1, v2) where v1 < v2
     edge_to_triangle_count = {}
     for triangle in triangles:
@@ -193,3 +227,10 @@ def compute_curvature(points, triangles):
     points_2d = points[:, :2] if points.shape[1] >= 2 else points
     visualize_vertex_labels(points_2d, vertex_curvatures_array,
                            title="Vertex Labels with Curvature Values")
+
+    # Show curvature heatmap visualization
+    print("\nGenerating curvature heatmap visualization...")
+    x_coords = points[:, 0]
+    y_coords = points[:, 1]
+    visualize_curvature_heatmap(x_coords, y_coords, vertex_curvatures_array,
+                               grid_size=50, method='nearest')
