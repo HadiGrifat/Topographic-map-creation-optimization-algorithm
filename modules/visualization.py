@@ -145,7 +145,7 @@ def create_3d_contour(xi, yi, zi, x_gps=None, y_gps=None, z_gps=None, vertical_e
     # Set viewing angle similar to Plotly
     ax.view_init(elev=20, azim=45)
     
-    # Set proper aspect ratio - prevent unrealistic vertical exaggeration
+    # set the aspect ratio, initallly added to fix unrealistic vertical exaggeration
     if x_gps is not None and y_gps is not None and z_gps is not None:
         ax.set_box_aspect(vertical_exaggeration_ratio(x_gps, y_gps, z_gps, vertical_exaggeration))
     
@@ -176,7 +176,7 @@ def render_triangular_mesh(x, y, z, triangles, title_suffix="", vertical_exagger
     # Set viewing angle
     ax.view_init(elev=30, azim=45)
     
-    # Set proper aspect ratio - prevent unrealistic vertical exaggeration
+    # set aspect ratio 
     ax.set_box_aspect(vertical_exaggeration_ratio(x, y, z, vertical_exaggeration))
     
     plt.tight_layout()
@@ -186,7 +186,7 @@ def render_wireframe_view(x, y, z, triangles, title_suffix="", vertical_exaggera
     fig = plt.figure(figsize=(14, 10))
     ax = fig.add_subplot(111, projection='3d')
     
-    # Plot wireframe (just the triangle edges)
+    # Plot wireframe
     ax.plot_trisurf(x, y, z, triangles=triangles, 
                    color='lightblue', alpha=0.3,
                    edgecolor='black', linewidth=0.5)
@@ -200,7 +200,7 @@ def render_wireframe_view(x, y, z, triangles, title_suffix="", vertical_exaggera
     ax.set_title(f'Delaunay Triangulation - Wireframe View{title_suffix}\nShowing triangle connections')
     ax.view_init(elev=30, azim=45)
     
-    # Set proper aspect ratio - prevent unrealistic vertical exaggeration
+    # set aspect ratio
     ax.set_box_aspect(vertical_exaggeration_ratio(x, y, z, vertical_exaggeration))
     
     plt.tight_layout()

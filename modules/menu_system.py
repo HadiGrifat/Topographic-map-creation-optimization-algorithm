@@ -76,7 +76,7 @@ def choose_multiple_files():
 def choose_data_source():
     """Let user choose which files to process"""
     print("\nData Source Selection:")
-    print("=" * 30)
+    print("=" * 35)
     print("1. Single file")
     print("2. Multiple files")
     
@@ -101,7 +101,7 @@ def choose_data_source():
 def choose_interpolation_method():
     """Let user choose specific interpolation method"""
     print("\nInterpolation Methods:")
-    print("=" * 30)
+    print("=" * 35)
     print("1. Linear Interpolation")
     print("2. Cubic Interpolation")
     print("3. Nearest Value Interpolation")
@@ -123,9 +123,9 @@ def choose_interpolation_method():
 def choose_delaunay_option():
     """Let user choose between mesh creation, analytics, or optimized solution for Delaunay triangulation"""
     print("\nDelaunay Triangulation Options:")
-    print("=" * 40)
+    print("=" * 35)
     print("1. Create Mesh (3D visualization)")
-    print("2. Triangle Analytics (quality analysis)")
+    print("2. Analytics")
     print("3. Optimized Solution (Steiner points)")
 
     while True:
@@ -134,7 +134,7 @@ def choose_delaunay_option():
             if choice == 1:
                 return 'delaunay_mesh'
             elif choice == 2:
-                return 'delaunay_analytics'
+                return choose_analytics_option()
             elif choice == 3:
                 return 'delaunay_optimized'
             else:
@@ -142,10 +142,29 @@ def choose_delaunay_option():
         except ValueError:
             print("Please enter a valid number")
 
+def choose_analytics_option():
+    """Let user choose between fatness analysis and curvature analysis"""
+    print("\nDelaunay Analytics Options:")
+    print("=" * 35)
+    print("1. Triangle Quality (Fatness Analysis)")
+    print("2. Vertex Curvature Analysis")
+
+    while True:
+        try:
+            choice = int(input("\nSelect option (1-2): "))
+            if choice == 1:
+                return 'delaunay_analytics'
+            elif choice == 2:
+                return 'delaunay_curvature'
+            else:
+                print("Please enter a number between 1 and 2")
+        except ValueError:
+            print("Please enter a valid number")
+
 def choose_method():
     """Let user choose mapping method"""
     print("\nMethod Selection:")
-    print("=" * 30)
+    print("=" * 35)
     print("1. Interpolation")
     print("2. Delaunay Triangulation")
     print("3. Exit")
@@ -185,7 +204,7 @@ def get_vertical_exaggeration():
     print("• 1.0 = True scale (may appear flat)")
     print("• 3.0 = Realistic view (recommended)")
     print("• >10 = Dramatic exaggeration")
-    
+
     while True:
         try:
             exaggeration = float(input("\nEnter vertical exaggeration factor (default: 3.0): ") or "3.0")
@@ -196,27 +215,110 @@ def get_vertical_exaggeration():
         except ValueError:
             print("Please enter a valid number")
 
+def get_curvature_options():
+    """Get curvature analysis options from user"""
+    print("\nCurvature Visualization Options:")
+    print("="*35)
+
+    # Interpolation method
+    print("Select interpolation method:")
+    print("1. Linear")
+    print("2. Cubic")
+    print("3. Nearest")
+
+    while True:
+        try:
+            interp_choice = int(input("\nEnter choice: "))
+            if interp_choice == 1:
+                interpolation_method = 'linear'
+                break
+            elif interp_choice == 2:
+                interpolation_method = 'cubic'
+                break
+            elif interp_choice == 3:
+                interpolation_method = 'nearest'
+                break
+            else:
+                print("Please enter a number between 1 and 3")
+        except ValueError:
+            print("Please enter a valid number")
+
+    # Normalization mode
+    print("\nSelect Normalization Mode:")
+    print("="*35)
+    print("1. Normal (no adjustment)")
+    print("2. Logarithmic scale")
+    print("3. Percentile (5-95%, removes outliers)")
+    print("4. Clip/cap maximum value")
+
+    while True:
+        try:
+            norm_choice = int(input("\nEnter choice: "))
+            if norm_choice == 1:
+                norm_mode = 'normal'
+                vmax = None
+                break
+            elif norm_choice == 2:
+                norm_mode = 'log'
+                vmax = None
+                break
+            elif norm_choice == 3:
+                norm_mode = 'percentile'
+                vmax = None
+                break
+            elif norm_choice == 4:
+                norm_mode = 'clip'
+                # Ask for vmax
+                while True:
+                    try:
+                        vmax_input = input("Enter maximum curvature value to display (default 1.0): ").strip()
+                        vmax = float(vmax_input) if vmax_input else 1.0
+                        if vmax > 0:
+                            break
+                        else:
+                            print("Value must be positive")
+                    except ValueError:
+                        print("Please enter a valid number")
+                break
+            else:
+                print("Please enter a number between 1 and 4")
+        except ValueError:
+            print("Please enter a valid number")
+
+    return interpolation_method, norm_mode, vmax
+
 def get_user_choices():
     """Get all user choices and return them"""
-    print("Mapping Project - Interactive Pipeline")
+    print("\nMapping Project - Interactive Pipeline")
     print("=" * 45)
-    
+
     # Get method choice
     method = choose_method()
-    
+
     if method is None:
-        return None, None, None, None, None
-    
+        return None, None, None, None, None, None, None, None
+
     # Get data source
     data_source, is_multiple = choose_data_source()
-    
+
     # Get grid size for interpolation methods only
     if method in ['linear', 'cubic', 'nearest']:
         grid_size = get_grid_size()
     else:
         grid_size = None  # Not needed for non-interpolation methods
-    
-    # Get vertical exaggeration for all 3D visualizations
-    vertical_exaggeration = get_vertical_exaggeration()
-    
-    return method, data_source, is_multiple, grid_size, vertical_exaggeration
+
+    # Get vertical exaggeration for all 3D visualizations (except curvature)
+    if method != 'delaunay_curvature':
+        vertical_exaggeration = get_vertical_exaggeration()
+    else:
+        vertical_exaggeration = None
+
+    # Get curvature-specific options
+    if method == 'delaunay_curvature':
+        interpolation_method, norm_mode, vmax = get_curvature_options()
+    else:
+        interpolation_method = None
+        norm_mode = None
+        vmax = None
+
+    return method, data_source, is_multiple, grid_size, vertical_exaggeration, interpolation_method, norm_mode, vmax
