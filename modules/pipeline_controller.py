@@ -36,7 +36,16 @@ def run_delaunay_optimized_pipeline(pipeline, method, vertical_exaggeration):
     pipeline.visualize_optimized_wireframe(vertical_exaggeration=vertical_exaggeration)
     print(f"\n{method} optimization completed successfully!")
 
-def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exaggeration=3):
+def run_delaunay_curvature_pipeline(pipeline, method, interpolation_method, norm_mode, vmax):
+    """Execute Delaunay triangulation curvature analysis workflow"""
+    pipeline.visualize_3d_original()
+    pipeline.create_triangulation()
+    pipeline.analyze_curvature(interpolation_method=interpolation_method,
+                              norm_mode=norm_mode, vmax=vmax)
+    print(f"\n{method} curvature analysis completed successfully!")
+
+def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exaggeration=3,
+                interpolation_method='cubic', norm_mode='normal', vmax=None):
     """Execute a mapping pipeline with the specified method and data"""
     if data_source is None:
         print("No data source selected.")
@@ -51,6 +60,8 @@ def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exagge
         pipeline_type = "delaunay_analytics"
     elif method == 'delaunay_optimized':
         pipeline_type = "delaunay_optimized"
+    elif method == 'delaunay_curvature':
+        pipeline_type = "delaunay_curvature"
     else:
         print(f"Unknown method: {method}")
         return False
@@ -72,6 +83,8 @@ def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exagge
             run_delaunay_analytics_pipeline(pipeline, method, vertical_exaggeration)
         elif pipeline_type == "delaunay_optimized":
             run_delaunay_optimized_pipeline(pipeline, method, vertical_exaggeration)
+        elif pipeline_type == "delaunay_curvature":
+            run_delaunay_curvature_pipeline(pipeline, method, interpolation_method, norm_mode, vmax)
         return True
 
     except NotImplementedError as e:

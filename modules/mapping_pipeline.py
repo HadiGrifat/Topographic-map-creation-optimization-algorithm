@@ -4,6 +4,7 @@ from .visualization import plot_3D, create_contour_plot, create_3d_contour, rend
 from .interpolation import create_grid, interpolate_elevation
 from .delaunay_triangulation import build_delaunay_triangulation, optimize_with_steiner_points
 from .analytics import analyze_triangulation_quality
+from .curvature import compute_curvature
 
 class MappingPipeline:
     def __init__(self):
@@ -137,3 +138,16 @@ class MappingPipeline:
                             self.optimized_triangles,
                             title_suffix=f" (Optimized with {self.steiner_count} Steiner points)",
                             vertical_exaggeration=vertical_exaggeration)
+
+    def analyze_curvature(self, interpolation_method='cubic', norm_mode='normal', vmax=None):
+        """Perform vertex curvature analysis"""
+        if self.triangulation is None:
+            raise ValueError("No triangulation data available. Call create_triangulation() first.")
+
+        print("\nPerforming vertex curvature analysis...")
+        # create 3D points array
+        points_3d = np.column_stack((self.x, self.y, self.z))
+
+        compute_curvature(points_3d, self.triangulation.simplices,
+                         interpolation_method=interpolation_method,
+                         norm_mode=norm_mode, vmax=vmax)

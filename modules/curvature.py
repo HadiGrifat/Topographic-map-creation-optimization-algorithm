@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from .interpolation import create_grid, interpolate_elevation
 
-def visualize_curvature_heatmap(x, y, vertex_curvatures, grid_size=50, method='cubic'):
-
+def visualize_curvature_heatmap(x, y, vertex_curvatures, grid_size=50, method='cubic',
+                                norm_mode='normal', vmax=None):
     # Create interpolation grid
     xi, yi = create_grid(x, y, grid_size)
 
@@ -17,25 +17,54 @@ def visualize_curvature_heatmap(x, y, vertex_curvatures, grid_size=50, method='c
     # Create the heatmap visualization
     plt.figure(figsize=(12, 10))
 
-    # Filled contour plot (smooth color gradient)
-    plt.contourf(xi, yi, curvature_interpolated, levels=20, cmap='YlOrRd')
-    plt.colorbar(label="Curvature (radians)")
+    # Apply different normalization modes
+    if norm_mode == 'normal':
+        plt.contourf(xi, yi, curvature_interpolated, levels=20, cmap='YlOrRd')
+        plt.colorbar(label="Curvature (radians)")
+        title_suffix = ""
+
+    elif norm_mode == 'log':
+        curvature_log = np.log1p(curvature_interpolated)
+        plt.contourf(xi, yi, curvature_log, levels=20, cmap='YlOrRd')
+        plt.colorbar(label="Log Curvature (radians)")
+        title_suffix = " (Log Scale)"
+
+    elif norm_mode == 'percentile':
+        vmin = np.percentile(curvature_interpolated, 5)
+        vmax_calc = np.percentile(curvature_interpolated, 95)
+        plt.contourf(xi, yi, curvature_interpolated, levels=20, cmap='YlOrRd',
+                    vmin=vmin, vmax=vmax_calc)
+        plt.colorbar(label="Curvature (radians, 5-95 percentile)")
+        title_suffix = " (Percentile Norm)"
+
+    elif norm_mode == 'clip':
+        if vmax is None:
+            vmax = 1.0
+        plt.contourf(xi, yi, curvature_interpolated, levels=20, cmap='YlOrRd',
+                    vmin=0, vmax=vmax)
+        plt.colorbar(label=f"Curvature (radians, capped at {vmax})")
+        title_suffix = f" (Clipped at {vmax})"
+    else:
+        # Default to normal if unknown mode
+        plt.contourf(xi, yi, curvature_interpolated, levels=20, cmap='YlOrRd')
+        plt.colorbar(label="Curvature (radians)")
+        title_suffix = ""
 
     # Optional: Add contour lines for reference
-    contour_lines = plt.contour(xi, yi, curvature_interpolated,
-                                colors='black', linewidths=0.3, alpha=0.3)
+    plt.contour(xi, yi, curvature_interpolated,
+                colors='black', linewidths=0.3, alpha=0.3)
 
     # Overlay GPS points as small dots
     plt.scatter(x, y, c='black', s=10, alpha=0.5, edgecolors='white', linewidths=0.5)
 
-    plt.title(f"Curvature Heatmap")
+    plt.title(f"Curvature Heatmap{title_suffix}")
     plt.xlabel("X (m)")
     plt.ylabel("Y (m)")
     plt.axis('equal')
     plt.tight_layout()
     plt.show()
 
-def visualize_vertex_labels(points, vertex_curvatures=None, title="Vertex Labels and Positions"):
+def visualize_vertex_labels(points, vertex_curvatures=None):
 
     _, ax = plt.subplots(figsize=(14, 12))
 
@@ -65,13 +94,13 @@ def visualize_vertex_labels(points, vertex_curvatures=None, title="Vertex Labels
     ax.set_aspect('equal')
     ax.set_xlabel('X (m)', fontsize=12)
     ax.set_ylabel('Y (m)', fontsize=12)
-    ax.set_title(title, fontsize=14)
+    ax.set_title("Vertex Labels and Positions", fontsize=14)
     ax.grid(True, alpha=0.3)
 
     plt.tight_layout()
     plt.show()
 
-def compute_curvature(points, triangles):
+def compute_curvature(points, triangles, interpolation_method='cubic', norm_mode='normal', vmax=None):
 
     vertex_curvatures = []
     n_vertices = len(points)
@@ -201,7 +230,6 @@ def compute_curvature(points, triangles):
     print("="*80)
 
     # Export detailed results to CSV file
-    print("\nExporting detailed results to file...")
     import csv
     output_file = "curvature_analysis_results.csv"
     try:
@@ -223,14 +251,12 @@ def compute_curvature(points, triangles):
         print(f"      Warning: Could not export to CSV: {e}")
 
     # Show vertex labels visualization
-    print("\nGenerating vertex label visualization...")
     points_2d = points[:, :2] if points.shape[1] >= 2 else points
-    visualize_vertex_labels(points_2d, vertex_curvatures_array,
-                           title="Vertex Labels with Curvature Values")
+    visualize_vertex_labels(points_2d, vertex_curvatures_array)
 
     # Show curvature heatmap visualization
-    print("\nGenerating curvature heatmap visualization...")
     x_coords = points[:, 0]
     y_coords = points[:, 1]
     visualize_curvature_heatmap(x_coords, y_coords, vertex_curvatures_array,
-                               grid_size=50, method='nearest')
+                               grid_size=50, method=interpolation_method,
+                               norm_mode=norm_mode, vmax=vmax)
