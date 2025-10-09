@@ -1,13 +1,15 @@
-"""
-Main entry point for the mapping project
-Coordinates between UI (menu_system) and mapping logic (pipeline_controller)
-"""
 from modules.menu_system import get_user_choices
 from modules.pipeline_controller import run_pipeline
+import os
+
+def clear_terminal():
+    """Clears the terminal screen"""
+    os.system('cls' if os.name == 'nt' else 'clear') # cls for Windows, clear for Unix
 
 def main():
     """Main entry point - coordinates UI and mapping logic"""
     while True:
+        clear_terminal()
         # Get user choices from UI
         method, data_source, is_multiple, grid_size, vertical_exaggeration, interpolation_method, norm_mode, vmax = get_user_choices()
 
