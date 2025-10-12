@@ -3,18 +3,7 @@ from scipy.spatial import Delaunay
 from scipy.interpolate import griddata
 
 def build_delaunay_triangulation(x, y, z):
-    """
-    Create Delaunay triangulation from 2D coordinates
-    
-    Args:
-        x, y: Arrays of coordinate positions (meters)
-        z: Array of elevation values (meters)
-    
-    Returns:
-        triangulation: Delaunay triangulation object
-        triangles: Array of triangle indices
-        num_triangles: Number of triangles created
-    """
+
     points_2d = np.column_stack((x, y))
     triangulation = Delaunay(points_2d)
     triangles = triangulation.simplices
@@ -23,20 +12,8 @@ def build_delaunay_triangulation(x, y, z):
 
     return triangulation, triangles, len(triangles)
 
+
 def optimize_with_steiner_points(x, y, z, triangulation):
-    """
-    Optimize triangulation by adding Steiner points at edge midpoints
-
-    Args:
-        x, y, z: Original coordinate arrays
-        triangulation: Original Delaunay triangulation object
-
-    Returns:
-        new_triangulation: Optimized triangulation with Steiner points
-        new_triangles: New triangle indices
-        new_x, new_y, new_z: Expanded coordinate arrays including Steiner points
-        steiner_count: Number of Steiner points added
-    """
 
     # Get original points
     original_points = np.column_stack((x, y))

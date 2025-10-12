@@ -21,9 +21,9 @@ def main():
         success = run_pipeline(method, data_source, is_multiple, grid_size, vertical_exaggeration,
                              interpolation_method, norm_mode, vmax)
         if success:
-            print("\nPipeline completed successfully!")
+            print("\nAnalysis Completed!")
         else:
-            print("\nPipeline failed. Please try again.")
+            print("\nCritical Failure")
 
         # Ask if user wants to continue
         print("\n" + "="*50)

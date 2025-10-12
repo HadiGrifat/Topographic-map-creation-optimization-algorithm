@@ -5,17 +5,6 @@ from matplotlib.patches import Polygon
 from matplotlib.collections import PatchCollection
 
 def calculate_triangle_fatness(points, triangles):
-    """
-    Calculate fatness (inradius/circumradius ratio) for each triangle in Delaunay triangulation
-
-    Args:
-        points: Array of 2D coordinates [[x1, y1], [x2, y2], ...]
-        triangles: Array of triangle vertex indices from Delaunay triangulation
-
-    Returns:
-        fatness_ratios: Array of r/R ratios for each triangle
-        triangle_stats: Dictionary with statistics about triangle quality
-    """
     fatness_ratios = []
     inradii = []
     circumradii = []
@@ -69,15 +58,7 @@ def calculate_triangle_fatness(points, triangles):
     return fatness_ratios, triangle_stats
 
 def visualize_triangle_fatness(points, triangles, fatness_ratios, title="Triangle Fatness Analysis"):
-    """
-    Create color-coded visualization of triangle fatness
 
-    Args:
-        points: Array of 2D coordinates
-        triangles: Array of triangle vertex indices
-        fatness_ratios: Array of r/R ratios for each triangle
-        title: Plot title
-    """
     fig, ax = plt.subplots(figsize=(12, 10))
 
     # Create custom colormap: red (skinny) -> yellow (moderate) -> green (fat)
@@ -124,36 +105,16 @@ def visualize_triangle_fatness(points, triangles, fatness_ratios, title="Triangl
     plt.show()
 
 def print_fatness_report(triangle_stats):
-    """
-    Print detailed triangle quality analysis report
-
-    Args:
-        triangle_stats: Dictionary with triangle statistics
-    """
-    print("\n" + "="*60)
-    print("DELAUNAY TRIANGULATION QUALITY ANALYSIS")
-    print("="*60)
+    print("\nDelaunay Triangulation Quality Report")
+    print("="*35)
 
     print(f"Total triangles: {triangle_stats['total_triangles']}")
-    print(f"Mean triangle area: {triangle_stats['mean_area']:.2f} m²")
-    print()
-
-    print("FATNESS RATIO STATISTICS (r/R):")
-    print(f"  Mean fatness: {triangle_stats['mean_fatness']:.3f}")
-    print(f"  Median fatness: {triangle_stats['median_fatness']:.3f}")
     print(f"  Min fatness: {triangle_stats['min_fatness']:.3f}")
     print(f"  Max fatness: {triangle_stats['max_fatness']:.3f}")
-    print(f"  Standard deviation: {triangle_stats['std_fatness']:.3f}")
     print()
 
-    print("TRIANGLE QUALITY DISTRIBUTION:")
     print(f"  Fat triangles (r/R ≥ 0.5): {triangle_stats['fat_triangles_count']} ({triangle_stats['fat_percentage']:.1f}%)")
     print(f"  Skinny triangles (r/R < 0.3): {triangle_stats['skinny_triangles_count']} ({triangle_stats['skinny_percentage']:.1f}%)")
-    print()
-
-    print("GEOMETRIC MEASUREMENTS:")
-    print(f"  Mean inradius: {triangle_stats['mean_inradius']:.2f} m")
-    print(f"  Mean circumradius: {triangle_stats['mean_circumradius']:.2f} m")
     print()
 
     # Quality assessment
@@ -166,21 +127,11 @@ def print_fatness_report(triangle_stats):
     else:
         quality_grade = "POOR"
 
-    print(f"OVERALL MESH QUALITY: {quality_grade}")
-    print("="*60)
+    print(f"Overall Mesh Fatness Quality: {quality_grade}")
+    print("="*35)
 
 def analyze_triangulation_quality(triangulation, points):
-    """
-    Complete analysis pipeline for triangle quality assessment
-
-    Args:
-        triangulation: Scipy Delaunay triangulation object
-        points: Array of 2D coordinates
-
-    Returns:
-        fatness_ratios: Array of fatness ratios
-        triangle_stats: Statistics dictionary
-    """
+    
     triangles = triangulation.simplices
 
     # Calculate fatness metrics
@@ -191,5 +142,3 @@ def analyze_triangulation_quality(triangulation, points):
 
     # Create visualization
     visualize_triangle_fatness(points, triangles, fatness_ratios)
-
-    return fatness_ratios, triangle_stats

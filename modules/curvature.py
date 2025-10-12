@@ -134,7 +134,10 @@ def compute_curvature(points, triangles, interpolation_method='cubic', norm_mode
         boundary_vertices.add(edge[0])
         boundary_vertices.add(edge[1])
 
-    print(f"\nBoundary Detection:")
+    print(f"\nCurvature Analysis Report:")
+    print("="*35)
+    print(f"Boundary Detection:")
+    print("-"*35)
     print(f"  Total edges: {len(edge_to_triangle_count)}")
     print(f"  Boundary edges: {len(boundary_edges)}")
     print(f"  Boundary vertices: {len(boundary_vertices)}")
@@ -183,25 +186,17 @@ def compute_curvature(points, triangles, interpolation_method='cubic', norm_mode
 
     vertex_curvatures_array = np.array(vertex_curvatures)
 
-    # print detailed curvature report
-    print("\n" + "="*80)
-    print("VERTEX CURVATURE ANALYSIS - DETAILED OUTPUT")
-    print("="*80)
-    print(f"Total vertices: {n_vertices}")
-    print(f"  Boundary vertices: {len(boundary_vertices)} (curvature = 0)")
-    print(f"  Interior vertices: {n_vertices - len(boundary_vertices)}")
-
     # Get interior vertices only for stats
     interior_curvatures = np.array([vertex_curvatures_array[i] for i in range(n_vertices)
                                      if i not in boundary_vertices])
 
     print(f"\nCurvature Statistics (Interior vertices only):")
+    print("-"*35)
     if len(interior_curvatures) > 0:
         print(f"  Min curvature:    {np.min(interior_curvatures):.6f} radians")
         print(f"  Max curvature:    {np.max(interior_curvatures):.6f} radians")
         print(f"  Mean curvature:   {np.mean(interior_curvatures):.6f} radians")
         print(f"  Median curvature: {np.median(interior_curvatures):.6f} radians")
-        print(f"  Std deviation:    {np.std(interior_curvatures):.6f} radians")
     else:
         print("  No interior vertices found!")
 
@@ -214,6 +209,7 @@ def compute_curvature(points, triangles, interpolation_method='cubic', norm_mode
         interior_curvatures_with_idx.sort(key=lambda x: x[1])
 
         print(f"\n5 Interior Vertices with LOWEST curvature (flattest):")
+        print("-"*35)
         for i in range(min(5, len(interior_curvatures_with_idx))):
             idx, curv = interior_curvatures_with_idx[i]
             print(f"  Vertex {idx:4d}: {curv:.6f} rad | "
@@ -221,13 +217,14 @@ def compute_curvature(points, triangles, interpolation_method='cubic', norm_mode
                   f"Coords: ({points[idx, 0]:.2f}, {points[idx, 1]:.2f})")
 
         print(f"\n5 Interior Vertices with HIGHEST curvature (most curved):")
+        print("-"*35)
         for i in range(min(5, len(interior_curvatures_with_idx))):
             idx, curv = interior_curvatures_with_idx[-(i+1)]
             print(f"  Vertex {idx:4d}: {curv:.6f} rad | "
                   f"Triangles: {len(vertex_to_triangles[idx]):2d} | "
                   f"Coords: ({points[idx, 0]:.2f}, {points[idx, 1]:.2f})")
 
-    print("="*80)
+    print("="*35)
 
     # Export detailed results to CSV file
     import csv
@@ -245,10 +242,9 @@ def compute_curvature(points, triangles, interpolation_method='cubic', norm_mode
                     f"{points[i, 0]:.2f}",
                     f"{points[i, 1]:.2f}"
                 ])
-        print(f"      Results exported to: {output_file}")
-        print(f"      Total rows: {n_vertices}")
+        print(f"Results exported to: {output_file}")
     except Exception as e:
-        print(f"      Warning: Could not export to CSV: {e}")
+        print(f"Warning: Could not export to CSV: {e}")
 
     # Show vertex labels visualization
     points_2d = points[:, :2] if points.shape[1] >= 2 else points
