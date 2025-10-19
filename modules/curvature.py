@@ -3,75 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib.tri import Triangulation
 from scipy.spatial import Voronoi
 from matplotlib.patches import Polygon
-from matplotlib.collections import PatchCollection
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from .interpolation import create_grid, interpolate_elevation
+from matplotlib.colors import Normalize
 
-def visualize_curvature_heatmap(x, y, vertex_curvatures, grid_size=50, method='cubic',
-                                norm_mode='normal', vmax=None):
-    # Create interpolation grid
-    xi, yi = create_grid(x, y, grid_size)
-
-    # Interpolate curvature values onto the grid
-    curvature_interpolated = interpolate_elevation(
-        x, y, vertex_curvatures,
-        xi, yi,
-        method=method
-    )
-
-    # Create the heatmap visualization
-    plt.figure(figsize=(12, 10))
-
-    # Set level for contourf
-    levels = 50
-
-    # Apply different normalization modes
-    if norm_mode == 'normal':
-        plt.contourf(xi, yi, curvature_interpolated, levels=levels, cmap='turbo')
-        plt.colorbar(label="Curvature (radians)")
-        title_suffix = ""
-
-    elif norm_mode == 'log':
-        curvature_log = np.log1p(curvature_interpolated)
-        plt.contourf(xi, yi, curvature_log, levels=levels, cmap='turbo')
-        plt.colorbar(label="Log Curvature (radians)")
-        title_suffix = " (Log Scale)"
-
-    elif norm_mode == 'percentile':
-        vmin = np.percentile(curvature_interpolated, 5)
-        vmax_calc = np.percentile(curvature_interpolated, 95)
-        plt.contourf(xi, yi, curvature_interpolated, levels=levels, cmap='turbo',
-                    vmin=vmin, vmax=vmax_calc)
-        plt.colorbar(label="Curvature (radians, 5-95 percentile)")
-        title_suffix = " (Percentile Norm)"
-
-    elif norm_mode == 'clip':
-        if vmax is None:
-            vmax = 1.0
-        plt.contourf(xi, yi, curvature_interpolated, levels=levels, cmap='turbo',
-                    vmin=0, vmax=vmax)
-        plt.colorbar(label=f"Curvature (radians, capped at {vmax})")
-        title_suffix = f" (Clipped at {vmax})"
-    else:
-        # Default to normal if unknown mode
-        plt.contourf(xi, yi, curvature_interpolated, levels=levels, cmap='YlOrRd')
-        plt.colorbar(label="Curvature (radians)")
-        title_suffix = ""
-
-    # Optional: Add contour lines for reference
-    plt.contour(xi, yi, curvature_interpolated,
-                colors='black', linewidths=0.3, alpha=0.3)
-
-    # Overlay GPS points as small dots
-    plt.scatter(x, y, c='black', s=10, alpha=0.5, edgecolors='white', linewidths=0.5)
-
-    plt.title(f"Curvature Heatmap{title_suffix}")
-    plt.xlabel("X (m)")
-    plt.ylabel("Y (m)")
-    plt.axis('equal')
-    plt.tight_layout()
-    plt.show()
 
 def visualize_curvature_triangular_mesh(x, y, vertex_curvatures, triangles, norm_mode='normal', vmax=None):
 
@@ -79,8 +12,15 @@ def visualize_curvature_triangular_mesh(x, y, vertex_curvatures, triangles, norm
     tri = Triangulation(x, y, triangles)
 
     # Calculate face colors: average curvature of 3 vertices per triangle
-    # Handle NaN values by using nanmean
-    face_colors = np.nanmean(vertex_curvatures[triangles], axis=1)
+    # If ANY vertex in a triangle has NaN (boundary vertex), set entire triangle to NaN
+    face_colors = np.zeros(len(triangles))
+    for i, triangle in enumerate(triangles):
+        triangle_curvatures = vertex_curvatures[triangle]
+        # If any vertex is NaN (boundary), mark the whole triangle as NaN
+        if np.any(np.isnan(triangle_curvatures)):
+            face_colors[i] = np.nan
+        else:
+            face_colors[i] = np.mean(triangle_curvatures)
 
     plt.figure(figsize=(12, 10))
 
@@ -241,204 +181,6 @@ def visualize_curvature_voronoi(x, y, vertex_curvatures, norm_mode='normal', vma
     plt.tight_layout()
     plt.show()
 
-def visualize_3d_elevation_colored_by_curvature(points, triangles, vertex_curvatures, norm_mode='normal', vmax=None):
-    """
-    3D surface showing ELEVATION as height, colored by CURVATURE values.
-    This shows WHERE on the terrain (high/low elevation) curvature occurs.
-    """
-    x = points[:, 0]
-    y = points[:, 1]
-    z = points[:, 2]  # Elevation
-
-    # Create triangulation
-    tri = Triangulation(x, y, triangles)
-
-    # Set up figure
-    fig = plt.figure(figsize=(14, 10))
-    ax = fig.add_subplot(111, projection='3d')
-
-    # Determine color normalization based on curvature
-    curvature_clean = vertex_curvatures[~np.isnan(vertex_curvatures)]
-
-    if norm_mode == 'log':
-        curv_for_color = np.log1p(vertex_curvatures)
-        curv_for_color[np.isnan(curv_for_color)] = 0
-        vmin_norm = np.log1p(curvature_clean.min())
-        vmax_norm = np.log1p(curvature_clean.max())
-        title_suffix = " (Log Scale Curvature)"
-        cbar_label = "Log Curvature (radians)"
-    elif norm_mode == 'percentile':
-        vmin_norm = np.nanpercentile(vertex_curvatures, 5)
-        vmax_norm = np.nanpercentile(vertex_curvatures, 95)
-        curv_for_color = vertex_curvatures.copy()
-        curv_for_color[np.isnan(curv_for_color)] = vmin_norm
-        title_suffix = " (Percentile Curvature)"
-        cbar_label = "Curvature (radians, 5-95 percentile)"
-    elif norm_mode == 'clip':
-        if vmax is None:
-            vmax = 1.0
-        vmin_norm = 0
-        vmax_norm = vmax
-        curv_for_color = vertex_curvatures.copy()
-        curv_for_color[np.isnan(curv_for_color)] = 0
-        title_suffix = f" (Clipped Curvature at {vmax})"
-        cbar_label = f"Curvature (radians, capped at {vmax})"
-    else:
-        vmin_norm = curvature_clean.min()
-        vmax_norm = curvature_clean.max()
-        curv_for_color = vertex_curvatures.copy()
-        curv_for_color[np.isnan(curv_for_color)] = 0
-        title_suffix = ""
-        cbar_label = "Curvature (radians)"
-
-    # Create the 3D surface plot
-    # Z = elevation (actual terrain height)
-    # facecolors = curvature (showing where terrain curves)
-
-    # Create a ScalarMappable for the colorbar (since plot_trisurf doesn't handle this well)
-    from matplotlib.colors import Normalize
-    norm = Normalize(vmin=vmin_norm, vmax=vmax_norm)
-
-    # Calculate face colors: average curvature of 3 vertices per triangle
-    # plot_trisurf needs face colors (one per triangle) not vertex colors
-    face_curvatures = np.array([np.nanmean([curv_for_color[t[0]], curv_for_color[t[1]], curv_for_color[t[2]]])
-                                 for t in triangles])
-
-    surf = ax.plot_trisurf(tri, z,
-                          cmap='jet',  # Rainbow colormap for curvature
-                          edgecolor='black',
-                          linewidth=0.1,
-                          alpha=0.9)
-
-    # Map curvature values to colors (use face colors, not vertex colors)
-    surf.set_array(face_curvatures)
-    surf.set_clim(vmin_norm, vmax_norm)
-
-    # Labels and colorbar
-    ax.set_xlabel('X (m)', fontsize=10)
-    ax.set_ylabel('Y (m)', fontsize=10)
-    ax.set_zlabel('Elevation (m)', fontsize=10)
-    ax.set_title(f'3D Terrain: Elevation (height) colored by Curvature{title_suffix}',
-                 fontsize=12, fontweight='bold')
-
-    # Create colorbar using ScalarMappable
-    sm = cm.ScalarMappable(cmap='jet', norm=norm)
-    sm.set_array([])
-    cbar = fig.colorbar(sm, ax=ax, shrink=0.5, aspect=5, pad=0.1)
-    cbar.set_label(cbar_label, rotation=270, labelpad=15)
-
-    plt.tight_layout()
-    plt.show()
-
-def visualize_3d_dual_comparison(points, triangles, vertex_curvatures, norm_mode='normal', vmax=None):
-    """
-    Side-by-side 3D comparison with synchronized rotation.
-    Left: Elevation surface (colored by elevation)
-    Right: Curvature surface (colored by curvature, Z = curvature magnitude)
-    """
-    x = points[:, 0]
-    y = points[:, 1]
-    z = points[:, 2]  # Elevation
-
-    # Create triangulation
-    tri = Triangulation(x, y, triangles)
-
-    # Prepare curvature for Z-axis on right plot
-    curvature_clean = vertex_curvatures.copy()
-    curvature_clean[np.isnan(curvature_clean)] = 0  # Replace NaN with 0 for visualization
-
-    # Set up figure with two 3D subplots
-    fig = plt.figure(figsize=(18, 8))
-
-    # Left plot: Elevation
-    ax1 = fig.add_subplot(121, projection='3d')
-    surf1 = ax1.plot_trisurf(tri, z,
-                            cmap='terrain',  # Terrain colormap for elevation
-                            edgecolor='black',
-                            linewidth=0.1,
-                            alpha=0.9)
-    surf1.set_array(z)
-
-    ax1.set_xlabel('X (m)', fontsize=10)
-    ax1.set_ylabel('Y (m)', fontsize=10)
-    ax1.set_zlabel('Elevation (m)', fontsize=10)
-    ax1.set_title('Terrain Elevation', fontsize=12, fontweight='bold')
-
-    # Create colorbar using ScalarMappable for elevation
-    from matplotlib.colors import Normalize
-    norm_elev = Normalize(vmin=z.min(), vmax=z.max())
-    sm1 = cm.ScalarMappable(cmap='terrain', norm=norm_elev)
-    sm1.set_array([])
-    cbar1 = fig.colorbar(sm1, ax=ax1, shrink=0.5, aspect=5, pad=0.1)
-    cbar1.set_label('Elevation (m)', rotation=270, labelpad=15)
-
-    # Right plot: Curvature as height
-    ax2 = fig.add_subplot(122, projection='3d')
-
-    # Determine curvature normalization
-    if norm_mode == 'log':
-        curv_display = np.log1p(curvature_clean)
-        vmin_norm = curv_display.min()
-        vmax_norm = curv_display.max()
-        title_suffix = " (Log Scale)"
-        cbar_label = "Log Curvature"
-    elif norm_mode == 'percentile':
-        vmin_norm = np.nanpercentile(vertex_curvatures, 5)
-        vmax_norm = np.nanpercentile(vertex_curvatures, 95)
-        curv_display = curvature_clean
-        title_suffix = " (Percentile)"
-        cbar_label = "Curvature (radians, 5-95%)"
-    elif norm_mode == 'clip':
-        if vmax is None:
-            vmax = 1.0
-        curv_display = np.clip(curvature_clean, 0, vmax)
-        vmin_norm = 0
-        vmax_norm = vmax
-        title_suffix = f" (Clipped at {vmax})"
-        cbar_label = f"Curvature (capped at {vmax})"
-    else:
-        curv_display = curvature_clean
-        vmin_norm = curv_display.min()
-        vmax_norm = curv_display.max()
-        title_suffix = ""
-        cbar_label = "Curvature (radians)"
-
-    # Calculate face colors for curvature plot
-    face_curvatures = np.array([np.nanmean([curv_display[t[0]], curv_display[t[1]], curv_display[t[2]]])
-                                 for t in triangles])
-
-    surf2 = ax2.plot_trisurf(tri, curv_display,  # Z = curvature magnitude
-                            cmap='jet',  # Rainbow colormap
-                            edgecolor='black',
-                            linewidth=0.1,
-                            alpha=0.9)
-    surf2.set_array(face_curvatures)
-
-    ax2.set_xlabel('X (m)', fontsize=10)
-    ax2.set_ylabel('Y (m)', fontsize=10)
-    ax2.set_zlabel('Curvature (radians)', fontsize=10)
-    ax2.set_title(f'Terrain Curvature{title_suffix}', fontsize=12, fontweight='bold')
-
-    # Create colorbar using ScalarMappable for curvature
-    norm_curv = Normalize(vmin=vmin_norm, vmax=vmax_norm)
-    sm2 = cm.ScalarMappable(cmap='jet', norm=norm_curv)
-    sm2.set_array([])
-    cbar2 = fig.colorbar(sm2, ax=ax2, shrink=0.5, aspect=5, pad=0.1)
-    cbar2.set_label(cbar_label, rotation=270, labelpad=15)
-
-    # Synchronize viewing angles
-    def on_move(event):
-        if event.inaxes == ax1:
-            ax2.view_init(elev=ax1.elev, azim=ax1.azim)
-        elif event.inaxes == ax2:
-            ax1.view_init(elev=ax2.elev, azim=ax2.azim)
-        fig.canvas.draw_idle()
-
-    fig.canvas.mpl_connect('motion_notify_event', on_move)
-
-    plt.tight_layout()
-    plt.show()
-
 def visualize_curvature_distribution(vertex_curvatures, boundary_vertices):
 
     # Filter out boundary vertices (NaN values)
@@ -552,7 +294,7 @@ def visualize_vertex_labels(points, vertex_curvatures=None):
     plt.tight_layout()
     plt.show()
 
-def compute_curvature(points, triangles, interpolation_method='cubic', norm_mode='normal', vmax=None):
+def compute_curvature(points, triangles, norm_mode='normal', vmax=None):
 
     vertex_curvatures = []
     n_vertices = len(points)
@@ -638,6 +380,14 @@ def compute_curvature(points, triangles, interpolation_method='cubic', norm_mode
 
     vertex_curvatures_array = np.array(vertex_curvatures)
 
+    # filter out numerical noise: treat very small values as zero
+    numerical_noise_threshold = 1e-10
+    vertex_curvatures_array = np.where(
+        np.abs(vertex_curvatures_array) < numerical_noise_threshold,
+        0.0,
+        vertex_curvatures_array
+    )
+
     # Get interior vertices only for stats
     interior_curvatures = np.array([vertex_curvatures_array[i] for i in range(n_vertices)
                                      if i not in boundary_vertices])
@@ -719,16 +469,4 @@ def compute_curvature(points, triangles, interpolation_method='cubic', norm_mode
                                        triangles, norm_mode=norm_mode, vmax=vmax)
 
     visualize_curvature_voronoi(x_coords, y_coords, vertex_curvatures_array,
-                               norm_mode=norm_mode, vmax=vmax)
-    '''
-    # 3D comparison visualizations
-    visualize_3d_elevation_colored_by_curvature(points, triangles, vertex_curvatures_array,
-                                                norm_mode=norm_mode, vmax=vmax)
-
-    visualize_3d_dual_comparison(points, triangles, vertex_curvatures_array,
-                                norm_mode=norm_mode, vmax=vmax)
-    '''
-    # interpolation-based heatmap
-    visualize_curvature_heatmap(x_coords, y_coords, vertex_curvatures_array,
-                               grid_size=50, method=interpolation_method,
                                norm_mode=norm_mode, vmax=vmax)

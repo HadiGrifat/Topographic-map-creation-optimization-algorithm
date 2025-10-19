@@ -119,12 +119,11 @@ class MappingPipeline:
                             title_suffix=f" (Optimized with {self.steiner_count} Steiner points)",
                             vertical_exaggeration=vertical_exaggeration)
 
-    def analyze_curvature(self, interpolation_method='cubic', norm_mode='normal', vmax=None):
+    def analyze_curvature(self, norm_mode='normal', vmax=None):
         # Perform vertex curvature analysis
-        
+
         # create 3D points array
         points_3d = np.column_stack((self.x, self.y, self.z))
 
         compute_curvature(points_3d, self.triangulation.simplices,
-                         interpolation_method=interpolation_method,
                          norm_mode=norm_mode, vmax=vmax)

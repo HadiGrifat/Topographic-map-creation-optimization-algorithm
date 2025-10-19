@@ -2,6 +2,28 @@ import gpxpy
 from pyproj import Transformer
 import numpy as np
 
+def load_csv_meter_data(filename):
+    """
+    Load terrain data from CSV file in meter coordinates.
+
+    CSV format: X(m), Y(m), Z(m)
+    Lines starting with '#' are treated as comments/headers
+
+    Returns:
+        x, y, z: numpy arrays of coordinates in meters
+    """
+    data = np.loadtxt(filename, delimiter=',', comments='#')
+    x = data[:, 0]
+    y = data[:, 1]
+    z = data[:, 2]
+
+    # Normalize X and Y to start at origin
+    # Keep Z as-is to preserve the terrain's geometric properties
+    x = x - np.min(x)
+    y = y - np.min(y)
+
+    return x, y, z
+
 def load_gpx_data(filename):
     with open(filename, 'r') as f:
         gpx = gpxpy.parse(f)

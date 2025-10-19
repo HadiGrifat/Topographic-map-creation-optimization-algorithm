@@ -32,16 +32,15 @@ def run_delaunay_optimized_pipeline(pipeline, method, vertical_exaggeration):
     pipeline.visualize_optimized_mesh(vertical_exaggeration=vertical_exaggeration)
     pipeline.visualize_optimized_wireframe(vertical_exaggeration=vertical_exaggeration)
 
-def run_delaunay_curvature_pipeline(pipeline, method, interpolation_method, norm_mode, vmax):
+def run_delaunay_curvature_pipeline(pipeline, method, norm_mode, vmax):
     # Execute Delaunay triangulation curvature analysis workflow
     pipeline.visualize_3d_original()
     pipeline.create_triangulation()
-    pipeline.analyze_curvature(interpolation_method=interpolation_method,
-                              norm_mode=norm_mode, vmax=vmax)
+    pipeline.analyze_curvature(norm_mode=norm_mode, vmax=vmax)
 
 # Execute a mapping pipeline with the specified method and data
 def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exaggeration=3,
-                interpolation_method='cubic', norm_mode='normal', vmax=None):
+                norm_mode='normal', vmax=None):
     if data_source is None:
         print("No data source selected.")
         return False
@@ -82,7 +81,7 @@ def run_pipeline(method, data_source, is_multiple, grid_size=20, vertical_exagge
         elif pipeline_type == "delaunay_optimized":
             run_delaunay_optimized_pipeline(pipeline, method, vertical_exaggeration)
         elif pipeline_type == "delaunay_curvature":
-            run_delaunay_curvature_pipeline(pipeline, method, interpolation_method, norm_mode, vmax)
+            run_delaunay_curvature_pipeline(pipeline, method, norm_mode, vmax)
         return True
 
     except Exception as e:

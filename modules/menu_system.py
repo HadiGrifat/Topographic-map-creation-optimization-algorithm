@@ -216,33 +216,6 @@ def get_vertical_exaggeration():
             print("Please enter a valid number")
 
 def get_curvature_options():
-    """Get curvature analysis options from user"""
-    print("\nCurvature Visualization Options:")
-    print("="*35)
-
-    # Interpolation method
-    print("Select interpolation method:")
-    print("1. Linear")
-    print("2. Cubic")
-    print("3. Nearest")
-
-    while True:
-        try:
-            interp_choice = int(input("\nEnter choice: "))
-            if interp_choice == 1:
-                interpolation_method = 'linear'
-                break
-            elif interp_choice == 2:
-                interpolation_method = 'cubic'
-                break
-            elif interp_choice == 3:
-                interpolation_method = 'nearest'
-                break
-            else:
-                print("Please enter a number between 1 and 3")
-        except ValueError:
-            print("Please enter a valid number")
-
     # Normalization mode
     print("\nSelect Normalization Mode:")
     print("="*35)
@@ -285,7 +258,7 @@ def get_curvature_options():
         except ValueError:
             print("Please enter a valid number")
 
-    return interpolation_method, norm_mode, vmax
+    return norm_mode, vmax
 
 def get_user_choices():
     """Get all user choices and return them"""
@@ -315,10 +288,9 @@ def get_user_choices():
 
     # Get curvature-specific options
     if method == 'delaunay_curvature':
-        interpolation_method, norm_mode, vmax = get_curvature_options()
+        norm_mode, vmax = get_curvature_options()
     else:
-        interpolation_method = None
         norm_mode = None
         vmax = None
 
-    return method, data_source, is_multiple, grid_size, vertical_exaggeration, interpolation_method, norm_mode, vmax
+    return method, data_source, is_multiple, grid_size, vertical_exaggeration, norm_mode, vmax
