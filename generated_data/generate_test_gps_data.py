@@ -188,8 +188,14 @@ def generate_ridge(output_dir):
             # Distance from center line (j direction)
             dist_from_ridge = abs(j - center_j)
 
-            # Exponential drop-off
-            elevation = 100.0 + ridge_height * np.exp(-dist_from_ridge / 2.0)
+            # Use a parabolic profile which has constant curvature
+            # This creates a sharper ridge with measurable curvature
+            # z = height * (1 - (dist/width)^2)
+            width = 7.0  # Half-width of the ridge
+            if dist_from_ridge < width:
+                elevation = 100.0 + ridge_height * (1 - (dist_from_ridge / width)**2)
+            else:
+                elevation = 100.0
 
             x_coords.append(j * spacing_meters)
             y_coords.append(i * spacing_meters)

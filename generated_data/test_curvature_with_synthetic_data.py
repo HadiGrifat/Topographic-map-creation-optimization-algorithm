@@ -12,9 +12,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import numpy as np
+import matplotlib.pyplot as plt
 from modules.data_processing import load_csv_meter_data
 from modules.curvature import compute_curvature
 from scipy.spatial import Delaunay
+
+# No additional imports needed - we'll create our own visualization function
 
 
 def list_test_files():
@@ -78,6 +81,60 @@ def get_test_description(filename):
     return descriptions.get(filename, "No description available.")
 
 
+def visualize_terrain_surface(x, y, z, title="Test Terrain"):
+    """
+    Visualize the 3D terrain surface
+
+    Args:
+        x, y, z: Coordinate arrays
+        title: Plot title
+    """
+    # Reshape data for surface plot if it's a grid
+    n_points = len(x)
+    grid_size = int(np.sqrt(n_points))
+
+    fig = plt.figure(figsize=(14, 6))
+
+    # 3D surface plot
+    ax1 = fig.add_subplot(121, projection='3d')
+
+    if grid_size * grid_size == n_points:
+        # Perfect square - reshape for surface plot
+        X = x.reshape(grid_size, grid_size).T
+        Y = y.reshape(grid_size, grid_size).T
+        Z = z.reshape(grid_size, grid_size).T
+
+        surf = ax1.plot_surface(X, Y, Z,
+                               cmap='terrain',
+                               edgecolor='black',
+                               linewidth=0.2,
+                               alpha=0.9)
+        fig.colorbar(surf, ax=ax1, label='Elevation (m)', shrink=0.5)
+    else:
+        # Not a perfect square - use scatter plot
+        surf = ax1.scatter(x, y, z, c=z, cmap='terrain', s=30)
+        fig.colorbar(surf, ax=ax1, label='Elevation (m)', shrink=0.5)
+
+    ax1.set_xlabel('X (m)', fontsize=10)
+    ax1.set_ylabel('Y (m)', fontsize=10)
+    ax1.set_zlabel('Elevation (m)', fontsize=10)
+    ax1.set_title(f'{title} - 3D Surface', fontsize=12, fontweight='bold')
+    ax1.view_init(elev=25, azim=45)
+
+    # 2D heatmap
+    ax2 = fig.add_subplot(122)
+    scatter = ax2.scatter(x, y, c=z, cmap='terrain', s=50, edgecolors='black', linewidths=0.5)
+    fig.colorbar(scatter, ax=ax2, label='Elevation (m)')
+    ax2.set_xlabel('X (m)', fontsize=10)
+    ax2.set_ylabel('Y (m)', fontsize=10)
+    ax2.set_title(f'{title} - 2D Elevation Map', fontsize=12, fontweight='bold')
+    ax2.set_aspect('equal')
+    ax2.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+
 def run_curvature_analysis(csv_file, norm_mode='normal', vmax=None):
     """
     Run curvature analysis on a test file
@@ -105,21 +162,26 @@ def run_curvature_analysis(csv_file, norm_mode='normal', vmax=None):
     print(f"{'-'*70}")
 
     # Load CSV data directly
-    print("\n[1/3] Loading CSV data (meter coordinates)...")
+    print("\n[1/4] Loading CSV data (meter coordinates)...")
     x, y, z = load_csv_meter_data(str(csv_file))
     print(f"      Loaded {len(x)} vertices")
     print(f"      X range: [{np.min(x):.2f}, {np.max(x):.2f}] m")
     print(f"      Y range: [{np.min(y):.2f}, {np.max(y):.2f}] m")
     print(f"      Z range: [{np.min(z):.2f}, {np.max(z):.2f}] m")
 
+    # Visualize terrain surface
+    print("\n[2/4] Visualizing terrain surface...")
+    terrain_name = Path(csv_file).stem.replace("test_", "").replace("_", " ").title()
+    visualize_terrain_surface(x, y, z, title=terrain_name)
+
     # Build Delaunay triangulation
-    print("\n[2/3] Building Delaunay triangulation...")
+    print("\n[3/4] Building Delaunay triangulation...")
     points_2d = np.column_stack((x, y))
     triangulation = Delaunay(points_2d)
     print(f"      Created {len(triangulation.simplices)} triangles from {len(points_2d)} vertices")
 
     # Compute vertex curvature
-    print("\n[3/3] Computing vertex curvature...")
+    print("\n[4/4] Computing vertex curvature...")
     points_3d = np.column_stack((x, y, z))
 
     compute_curvature(points_3d, triangulation.simplices,

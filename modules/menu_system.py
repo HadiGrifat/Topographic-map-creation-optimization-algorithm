@@ -269,7 +269,7 @@ def get_user_choices():
     method = choose_method()
 
     if method is None:
-        return None, None, None, None, None, None, None, None
+        return None, None, None, None, None, None, None
 
     # Get data source
     data_source, is_multiple = choose_data_source()

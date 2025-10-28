@@ -16,4 +16,5 @@ CLAUDE.md
 # Results/output files (optional)
 Results/
 references/
+generated_data/
 GPX_to_KML.py
